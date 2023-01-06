@@ -2,12 +2,19 @@
 <html>
 <head>
   <title>Rotating logo - WebGL experiment</title>
+  <script type="importmap">
+    {
+      "imports": {
+	  "three":"./js/three.module.js"
+      }
+    }
+  </script>
+
 </head>
 <body>
   <h2>This is the outfielder problem</h2>
   <div id="canvas-container"></div>
   
-  <script src="js/three.min.js"></script>
-  <script src="js/main.js"></script>
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>
