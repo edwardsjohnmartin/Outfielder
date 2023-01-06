@@ -2,7 +2,7 @@ import * as THREE from './three.module.js';
 import {GLTFLoader} from './GLTFLoader.js';
 import {OrbitControls} from './OrbitControls.js';
 
-var scene, camera, renderer;
+var scene, camera, renderer, controls;
 
 var WIDTH  = 400;//window.innerWidth;
 var HEIGHT = 400;//window.innerHeight;
@@ -24,7 +24,7 @@ function init() {
 }
 
 function initControls() {
-  let controls = new OrbitControls(camera, renderer.domElement);
+  controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
 }
 
@@ -59,7 +59,7 @@ function initRenderer() {
 
 function render() {
   requestAnimationFrame(render);
-  // animate here.
+  controls.update();
   renderer.render(scene, camera);
 }
 
