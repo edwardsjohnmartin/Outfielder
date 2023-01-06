@@ -2,7 +2,7 @@ import * as THREE from './three.module.js';
 import {GLTFLoader} from './GLTFLoader.js';
 import {OrbitControls} from './OrbitControls.js';
 
-var scene, camera, renderer, cube;
+var scene, camera, renderer;
 
 var WIDTH  = 400;//window.innerWidth;
 var HEIGHT = 400;//window.innerHeight;
@@ -14,7 +14,6 @@ function init() {
 
   initScene();
   initLights();    
-  initCube();
   initCamera();
   initRenderer();
 
@@ -58,20 +57,9 @@ function initRenderer() {
   renderer.setSize(WIDTH, HEIGHT);
 }
 
-function initCube() {
-  cube = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshNormalMaterial());
-  scene.add(cube);
-}
-
-function rotateCube() {
-  cube.rotation.x -= SPEED * 2;
-  cube.rotation.y -= SPEED;
-  cube.rotation.z -= SPEED * 3;
-}
-
 function render() {
   requestAnimationFrame(render);
-  rotateCube();
+  // animate here.
   renderer.render(scene, camera);
 }
 
