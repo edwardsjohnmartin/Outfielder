@@ -9,11 +9,49 @@
       }
     }
   </script>
-
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <h2>This is the outfielder problem</h2>
-  <div id="canvas-container"></div>
+  <div class="logo"><i>Outfielder</i></div>
+
+  <table>
+    <tr>
+      <td>
+        <div>
+          <table>
+            <!-- Camera -->
+            <tr>
+              <td class="right">
+                <label for="cameras">Camera:</label>
+              </td>
+              <td>
+                <select id="cameras" onchange="cameraChanged()">
+                  <option value="fielder">Fielder</option>
+                  <option value="chase">Chase</option>
+                  <option value="home" selected>Home Plate</option>
+                  <option value="fixed">Fixed</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="right">Hits:</td>
+              <td>
+                <button id="hit-direct">Direct</button>
+                <button id="hit-direct-long">Direct Long</button>
+                <button id="hit-direct-short">Direct Short</button>
+                <button id="hit-random">Random</button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+
+      <td>
+        <div id="canvas-container"></div>
+      </td>
+    </tr>
+  </table>
+  
   
   <script type="module" src="./js/main.js"></script>
   <script type="module" src="./js/ball.js"></script>

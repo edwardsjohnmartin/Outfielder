@@ -11,8 +11,8 @@ var batter = new Batter();
 var fielder = new Fielder();
 var ball = new Ball();
 
-var WIDTH  = 400;//window.innerWidth;
-var HEIGHT = 400;//window.innerHeight;
+var WIDTH  = 600;//window.innerWidth;
+var HEIGHT = 600;//window.innerHeight;
 
 var SPEED = 0.01;
 
@@ -53,8 +53,17 @@ function initScene() {
   // Ball
   loader.load(ball.fileLocation, function(gltf) {
     scene.add(gltf.scene);
+    //    gltf.scene.scale.set(0.0762, 0.0762, 0.0762);  // 1 meter -> 3 inches diameter
+    gltf.scene.scale.set(0.5, 0.5, 0.5);
     ball.init(gltf.scene);
-    batter.hit(ball);
+    
+//    var bbox = new THREE.Box3().setFromObject(gltf.scene);
+//    console.log(bbox);
+    document.getElementById('hit-direct').disabled = false;
+    document.getElementById('hit-direct-long').disabled = false;
+    document.getElementById('hit-direct-short').disabled = false;
+    document.getElementById('hit-random').disabled = false;
+    
   }, undefined, function(error) {
     console.error(error);
   });
@@ -71,7 +80,7 @@ function initLights() {
 }
 
 function initCamera() {
-  camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.1, 1000);
   camera.position.set(0, 3.5, 5);
   camera.lookAt(scene.position);
 }
@@ -94,3 +103,23 @@ function render() {
 
 init();
 render();
+
+
+//==============================
+// Inputs
+document.getElementById('hit-direct').onclick = function() {
+  batter.hitDirect(ball, Batter.direct, fielder.position);
+}
+
+document.getElementById('hit-direct-long').onclick = function() {
+  batter.hitDirect(ball, Batter.directLong);
+}
+
+document.getElementById('hit-direct-short').onclick = function() {
+  batter.hitDirect(ball, Batter.directShort);
+}
+
+document.getElementById('hit-random').onclick = function() {
+  batter.hit(ball);
+}
+
