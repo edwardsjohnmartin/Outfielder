@@ -43,7 +43,8 @@ export class Batter {
       hitSpeed = 22.0;
     }
       
-    ball.reset(new THREE.Vector3(hitSpeed*Math.cos(hitAngle), hitSpeed*Math.sin(hitAngle), 0));
+    ball.reset();
+    ball.hit(new THREE.Vector3(hitSpeed*Math.cos(hitAngle), hitSpeed*Math.sin(hitAngle), 0));
   }
 
   //------------------------------------------

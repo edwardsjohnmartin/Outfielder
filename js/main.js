@@ -4,12 +4,14 @@ import {OrbitControls} from './OrbitControls.js';
 import {Ball} from './ball.js';
 import {Fielder} from './fielder.js';
 import {Batter} from './batter.js';
+import {Camera} from './camera.js';
 
-var scene, camera, renderer, controls, clock;
+var scene, renderer, controls, clock, sceneInited;
 
 var batter = new Batter();
 var fielder = new Fielder();
 var ball = new Ball();
+var camera = new Camera();
 
 var WIDTH  = 600;//window.innerWidth;
 var HEIGHT = 600;//window.innerHeight;
@@ -18,10 +20,12 @@ var SPEED = 0.01;
 
 function init() {
   scene = new THREE.Scene();
+  sceneInited = false;
 
   initScene();
-  initLights();    
-  initCamera();
+  initLights();
+  camera.init(WIDTH, HEIGHT);
+  cameraChanged();
   initRenderer();
 
   let canvas = document.getElementById('canvas-container');
@@ -31,21 +35,33 @@ function init() {
   clock = new THREE.Clock();
 
   fielder.position = new THREE.Vector3(106.0, 1.82, 0);
-  camera.position.set(fielder.position.x, fielder.position.y, fielder.position.z);
+}
+
+function cameraChanged() {
+  ball.reset();
+  camera.which = parseInt(document.getElementById('cameras').value);
 }
 
 function initControls() {
-  controls = new OrbitControls(camera, renderer.domElement);
+  controls = new OrbitControls(camera.renderCamera, renderer.domElement);
   controls.enableDamping = true;
 }
 
 function initScene() {
+  // Local to the function.
+  var envInited = false;
+  var ballInited = false;
+  
   // Environment
   const loader = new GLTFLoader();
   loader.load('assets/baseball_field/Baseball_Field.gltf', function(gltf) {
     gltf.scene.rotation.set(0, 3.1415, 0); // Rotate so +z is toward outfield
     gltf.scene.position.set(18.4, 0, 0);  // Set at home plate as origin.
     scene.add(gltf.scene);
+    envInited = true;
+    if (envInited && ballInited) {
+      sceneInited = true;
+    }
   }, undefined, function(error) {
     console.error(error);
   });
@@ -53,8 +69,6 @@ function initScene() {
   // Ball
   loader.load(ball.fileLocation, function(gltf) {
     scene.add(gltf.scene);
-    //    gltf.scene.scale.set(0.0762, 0.0762, 0.0762);  // 1 meter -> 3 inches diameter
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
     ball.init(gltf.scene);
     
 //    var bbox = new THREE.Box3().setFromObject(gltf.scene);
@@ -63,7 +77,11 @@ function initScene() {
     document.getElementById('hit-direct-long').disabled = false;
     document.getElementById('hit-direct-short').disabled = false;
     document.getElementById('hit-random').disabled = false;
-    
+
+    ballInited = true;
+    if (envInited && ballInited) {
+      sceneInited = true;
+    }
   }, undefined, function(error) {
     console.error(error);
   });
@@ -79,12 +97,6 @@ function initLights() {
   scene.add(ambientLight);
 }
 
-function initCamera() {
-  camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.1, 1000);
-  camera.position.set(0, 3.5, 5);
-  camera.lookAt(scene.position);
-}
-
 function initRenderer() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(WIDTH, HEIGHT);
@@ -92,13 +104,13 @@ function initRenderer() {
 
 function render() {
   requestAnimationFrame(render);
-  controls.update();
-  if (ball.inited) {
+  if (sceneInited) {
+    controls.update();
     ball.update(clock.getDelta());
-    camera.lookAt(ball.position);
+    fielder.update(clock.getDelta());
+    camera.update(ball.position, fielder.position);
   }
-  fielder.update(clock.getDelta());
-  renderer.render(scene, camera);
+  renderer.render(scene, camera.renderCamera);
 }
 
 init();
@@ -123,3 +135,4 @@ document.getElementById('hit-random').onclick = function() {
   batter.hit(ball);
 }
 
+document.getElementById('cameras').addEventListener("change", cameraChanged);

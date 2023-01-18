@@ -38,13 +38,19 @@ export class Ball {
   init(geo) {
     this._geo = geo;
     this._inited = true;
-    this._velocity = new THREE.Vector3(2, 2, 0);
+    //    geo.scale.set(0.0762, 0.0762, 0.0762);  // 1 meter -> 3 inches diameter
+    geo.scale.set(0.5, 0.5, 0.5);
   }
 
-  reset(velocity) {
+  reset() {
     this.position = new THREE.Vector3(0, 0.9144, 0);
+    this._velocity = new THREE.Vector3(0, 0, 0);
+  }
+
+  hit(velocity) {
     this._velocity = velocity;
   }
+
 
   update(timeDelta) {
     if (this._geo.position.y < .1) {

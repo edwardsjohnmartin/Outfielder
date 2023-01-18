@@ -25,14 +25,17 @@
                 <label for="cameras">Camera:</label>
               </td>
               <td>
-                <select id="cameras" onchange="cameraChanged()">
-                  <option value="fielder">Fielder</option>
-                  <option value="chase">Chase</option>
-                  <option value="home" selected>Home Plate</option>
-                  <option value="fixed">Fixed</option>
+                <select id="cameras">
+                  <option value=0>Fielder</option>
+                  <option value=2>Chase</option>
+                  <option value=1>Home Plate</option>
+                  <option value=3 selected>First Base</option>
+                  <option value=4>Third Base</option>
+                  <option value=5>Fixed 3</option>
                 </select>
               </td>
             </tr>
+            <!-- Hits -->
             <tr>
               <td class="right">Hits:</td>
               <td>
