@@ -1,6 +1,11 @@
 import * as THREE from './three.module.js';
 
 export class Fielder {
+  // This belongs in an environment data pipeline.
+  static get centerField() {
+    return new THREE.Vector3(106.0, 1.82, 0);
+  }
+
   constructor () {
     this._velocity = new THREE.Vector3(0, 0, 0);
     this._position = new THREE.Vector3(0, 0, 0);

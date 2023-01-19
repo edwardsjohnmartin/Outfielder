@@ -20,7 +20,6 @@ var SPEED = 0.01;
 
 function init() {
   initScene();
-  initLights();
   camera.init(WIDTH, HEIGHT);
   cameraChanged();
   initRenderer();
@@ -30,8 +29,7 @@ function init() {
 
   initControls();
   clock = new THREE.Clock();
-
-  fielder.position = new THREE.Vector3(106.0, 1.82, 0);
+  fielder.position = Fielder.centerField;
 }
 
 function cameraChanged() {
@@ -90,27 +88,19 @@ function initScene() {
   scene.add(new THREE.AxesHelper(5));
 
   initSkybox();
+  initLights();
 }
 
 function initSkybox() {
-  //  const which = "assets/skybox/bluecloud_";
   const which = "assets/skybox/sh_";
   const ext = ".png";
   const loader = new THREE.CubeTextureLoader();
-  const texture = loader.load([
-    which+"ft" + ext,
-    which+"bk" + ext,
-    which+"up" + ext,
-    which+"dn" + ext,
-    which+"rt" + ext,
-    which+"lf" + ext,
-/*    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
-    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
-    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
-    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
-    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
-    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',*/
-  ]);
+  const texture = loader.load([which+"ft" + ext,
+                               which+"bk" + ext,
+                               which+"up" + ext,
+                               which+"dn" + ext,
+                               which+"rt" + ext,
+                               which+"lf" + ext]);
   scene.background = texture;
 }
 
