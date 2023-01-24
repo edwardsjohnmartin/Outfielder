@@ -44,7 +44,6 @@ export class Camera {
       break;
     }
     this._which = cam;
-    console.log("Camera: " + this._which);
   }
 
   init(width, height) {

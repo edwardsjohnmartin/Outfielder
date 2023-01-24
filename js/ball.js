@@ -31,10 +31,6 @@ export class Ball {
     }
   }
 
-  set rotation(rotate) {
-    this._geo.position.set(pos.x, pos.y, pos.z);
-  }
-
   init(geo) {
     this._geo = geo;
     this._inited = true;
