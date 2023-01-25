@@ -6,6 +6,8 @@ import {Fielder} from './fielder.js';
 import {Batter} from './batter.js';
 import {Camera} from './camera.js';
 import {Label} from './label.js';
+import {Line} from './line.js';
+import {Diagram} from './diagram.js';
 
 var scene, renderer, controls, clock, sceneInited;
 
@@ -16,13 +18,15 @@ var camera = new Camera();
 var pauseSim = false;
 var simSpeed = 1.0;
 var label = new Label();
+var diagram = new Diagram();
 
 var canvas;
 var canvasRect;
 var canvasSize = new THREE.Vector2(600, 600);
 
-var SPEED = 0.01;
-
+//==============================
+// Init
+//
 function init() {
   initScene();
   camera.init(canvasSize.x, canvasSize.y);
@@ -33,18 +37,9 @@ function init() {
   canvas.appendChild(renderer.domElement);
   getCanvasRect();
 
+  diagram.init(scene);
   initControls();
   clock = new THREE.Clock();
-  fielder.position = Fielder.centerField;
-}
-
-function cameraChanged() {
-  ball.reset();
-  camera.which = parseInt(document.getElementById('cameras').value);
-}
-
-function getCanvasRect() {
-  canvasRect = canvas.getBoundingClientRect();
 }
 
 function initControls() {
@@ -53,13 +48,17 @@ function initControls() {
 }
 
 //-----------------------------
-// Axes:
-//  x: toward center field
-//  y: up
-//  z: right
 // Origin:
 //  Home plate
+// Environment Axes:
+//  x: toward second base
+//  y: up
+//  z: right
 //
+// Model axes:
+//  x: right
+//  y: toward second base
+//  z: up
 function initScene() {
   // Local to the function.
   var envInited = false;
@@ -85,7 +84,6 @@ function initScene() {
   loader.load(ball.fileLocation, function(gltf) {
     scene.add(gltf.scene);
     ball.init(gltf.scene);
-//    label.init(gltf.scene);
         
     document.getElementById('hit-direct').disabled = false;
     document.getElementById('hit-direct-long').disabled = false;
@@ -104,8 +102,9 @@ function initScene() {
   loader.load(fielder.fileLocation, function(gltf) {
     scene.add(gltf.scene);
     fielder.init(gltf.scene);
+    fielder.position = Fielder.centerField;
 
-    label.init(gltf.scene); // Label for the fielder
+    label.init(gltf.scene, "Hoopdy"); // Label for the fielder
     
     if (envInited && ball.inited && fielder.inited) {
       sceneInited = true;
@@ -142,10 +141,13 @@ function initLights() {
 }
 
 function initRenderer() {
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({antialias: true});
   renderer.setSize(canvasSize.x, canvasSize.y);
 }
 
+//=============================
+//  Tick
+//
 function render() {
   requestAnimationFrame(render);
   var deltaTime = clock.getDelta() * simSpeed;
@@ -158,6 +160,7 @@ function render() {
     controls.update();
     camera.update(ball.position, fielder.position);
     label.update(camera, canvasRect);
+    diagram.update(ball.position, fielder.position);
   }
   renderer.render(scene, camera.renderCamera);
 }
@@ -167,7 +170,8 @@ render();
 
 
 //==============================
-// Inputs
+// Listeners
+//
 document.getElementById('hit-direct').onclick = function() {
   batter.hitDirect(ball, Batter.direct, fielder.position);
   label.release();
@@ -193,3 +197,14 @@ document.getElementById('sim-speed').addEventListener("change", (event) => {
   simSpeed = document.getElementById('sim-speed').value;
 });
 window.addEventListener('resize', getCanvasRect);
+window.addEventListener('scroll', getCanvasRect);
+
+function cameraChanged() {
+  ball.reset();
+  camera.which = parseInt(document.getElementById('cameras').value);
+}
+
+function getCanvasRect() {
+  canvasRect = canvas.getBoundingClientRect();
+}
+

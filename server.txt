@@ -1,0 +1,5 @@
+five-server .   # uses .fiveserverrc
+
+-or-
+
+python3 -m http.server

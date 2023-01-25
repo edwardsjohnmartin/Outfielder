@@ -31,7 +31,8 @@ export class Batter {
 
     switch(distance) {
     case Batter.directLong:
-      hitSpeed = 44.7; // 100 mph
+      //      hitSpeed = 44.7; // 100 mph
+      hitSpeed = 37;
       break;
     case Batter.directShort:
       hitSpeed = 33.7;
