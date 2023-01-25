@@ -36,6 +36,14 @@ export class Label {
     this._worldAnchor.updateWorldMatrix(true, false);
     this._worldAnchor.getWorldPosition(vector);
 
+    // Outside the camera view frustum (for example: behind)
+    var frustum = new THREE.Frustum();
+    frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.renderCamera.projectionMatrix, camera.renderCamera.matrixWorldInverse));
+    if (!frustum.containsPoint(vector)) {
+      this._text.style.visibility = "hidden";
+      return;
+    }
+
     vector.project(camera.renderCamera);
     var pos = new THREE.Vector2(canvasRect.left + (vector.x + 1)/2 * (canvasRect.right - canvasRect.left),
                                 window.scrollY + canvasRect.top -(vector.y - 1)/2 * (canvasRect.bottom - canvasRect.top));
