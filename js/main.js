@@ -171,7 +171,7 @@ function render() {
     fielder.update(tickData);
 
     // Controls/Camera
-    controls.target = ball.position
+    controls.target = ball.position.clone();
     controls.update();
     camera.update(tickData);
 
