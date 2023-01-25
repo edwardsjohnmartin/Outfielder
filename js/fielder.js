@@ -48,6 +48,6 @@ export class Fielder {
     this.lookAt = new THREE.Vector3(-1, 0, 0);
   }
 
-  update(timeDelta) {
+  update(tickData) {
   }
 }

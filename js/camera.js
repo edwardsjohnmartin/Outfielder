@@ -50,7 +50,10 @@ export class Camera {
     this._renderCamera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
   }
 
-  update(ballPos, fielderPos) {
+  update(tickData) {
+    var ballPos = tickData.get("ball").position;
+    var fielderPos = tickData.get("fielder").position;
+    
     switch (this.which) {
     case Camera.fielder:
       this._renderCamera.position.set(fielderPos.x, fielderPos.y, fielderPos.z);

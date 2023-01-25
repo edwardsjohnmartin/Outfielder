@@ -48,10 +48,11 @@ export class Ball {
   }
 
 
-  update(timeDelta) {
+  update(tickData) {
     if (this._geo.position.y < .1) {
       return;
     }
+    const timeDelta = tickData.get("deltaTime");
     this._velocity.set(this._velocity.x,
                        this._velocity.y + gravity.y * timeDelta,
                        this._velocity.z);

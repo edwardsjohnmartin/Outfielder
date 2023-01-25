@@ -6,7 +6,6 @@ import {Fielder} from './fielder.js';
 import {Batter} from './batter.js';
 import {Camera} from './camera.js';
 import {Label} from './label.js';
-import {Line} from './line.js';
 import {Diagram} from './diagram.js';
 
 var scene, renderer, controls, clock, sceneInited;
@@ -104,7 +103,7 @@ function initScene() {
     fielder.init(gltf.scene);
     fielder.position = Fielder.centerField;
 
-    label.init(gltf.scene, "Hoopdy"); // Label for the fielder
+    label.initWithAnchor(gltf.scene, "Hoopdy"); // Label for the fielder
     
     if (envInited && ball.inited && fielder.inited) {
       sceneInited = true;
@@ -145,26 +144,48 @@ function initRenderer() {
   renderer.setSize(canvasSize.x, canvasSize.y);
 }
 
+function getFrustum(camera) {
+  var frustum = new THREE.Frustum();
+  frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.renderCamera.projectionMatrix,
+                                                                       camera.renderCamera.matrixWorldInverse));
+  return frustum;
+}
+
 //=============================
 //  Tick
 //
 function render() {
+  const tickData = new Map();
   requestAnimationFrame(render);
-  var deltaTime = clock.getDelta() * simSpeed;
+  tickData.set("deltaTime", clock.getDelta() * simSpeed);
+  tickData.set("fielder", fielder);
+  tickData.set("ball", ball);
+  tickData.set("camera", camera);
+  tickData.set("canvasRect", canvasRect);
+  
   if (sceneInited) {
+    // Sim elements
     if (!pauseSim) {
-      ball.update(deltaTime);
+      ball.update(tickData);
     }
-    fielder.update(deltaTime);
+    fielder.update(tickData);
+
+    // Controls/Camera
     controls.target = ball.position
     controls.update();
-    camera.update(ball.position, fielder.position);
-    label.update(camera, canvasRect);
-    diagram.update(ball.position, fielder.position);
+    camera.update(tickData);
+
+    // Visualization (need latest camera)
+    tickData.set("frustum", getFrustum(camera));  // All labels need this.
+    label.update(tickData);
+    diagram.update(tickData);
   }
   renderer.render(scene, camera.renderCamera);
 }
 
+//=============================
+//  Main
+//
 init();
 render();
 

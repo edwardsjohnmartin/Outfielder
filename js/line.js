@@ -7,7 +7,7 @@ export class Line {
     this._geo = null;
   }
   
-  init(scene, start, end) {
+  init(scene, start, end, labelText) {
     const points = [];
     points.push(new THREE.Vector3(start.x, start.y, start.z));
     points.push(new THREE.Vector3(end.x, end.y, end.z));
@@ -18,12 +18,26 @@ export class Line {
     var line = new THREE.Line(this._geo, new THREE.LineBasicMaterial({color:0xffffff}));
     line.frustumCulled = false;
     scene.add(line);
+    if (labelText) {
+      this._label = new Label();
+      this._label.init(labelText);
+    }
   }
   
-  update(start, end) {
+  update(start, end, tickData) {
     const position = this._geo.getAttribute('position');
     position.setXYZ(0, start.x, start.y, start.z);
     position.setXYZ(1, end.x, end.y, end.z);
     position.needsUpdate = true;
+    if (this._label) {
+      this.setLabelPos(start, end);
+      this._label.update(tickData);
+    }
+  }
+
+  setLabelPos(start, end) {
+    var diff = end.clone().sub(start);
+    var len = diff.length();
+    this._label.position = start.clone().add(diff.normalize().multiplyScalar(len/2));
   }
 }
