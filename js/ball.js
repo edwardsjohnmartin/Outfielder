@@ -10,13 +10,8 @@ export class Ball {
     this._velocity = new THREE.Vector3(0, 0, 0);
   }
 
-  get inited() {
-    return this._inited;
-  }
-
-  get fileLocation() {
-    return this._fileLocation;
-  }
+  get inited() {return this._inited;}
+  get fileLocation() {return this._fileLocation;}
 
   get position() {
     if (this._geo) {
@@ -27,7 +22,7 @@ export class Ball {
 
   set position(pos) {
     if (this._geo) {
-      this._geo.position.set(pos.x, pos.y, pos.z);
+      this._geo.position.copy(pos);
     }
   }
 
@@ -39,7 +34,7 @@ export class Ball {
   }
 
   reset() {
-    this.position = new THREE.Vector3(0, 0.9144, 0);
+    this.position = new THREE.Vector3(0, 0.9144, 0); // 3 feet above home plate
     this._velocity = new THREE.Vector3(0, 0, 0);
   }
 
@@ -53,15 +48,11 @@ export class Ball {
       return;
     }
     const timeDelta = tickData.get("deltaTime");
-    this._velocity.set(this._velocity.x,
-                       this._velocity.y + gravity.y * timeDelta,
-                       this._velocity.z);
-    this._geo.position.set(this.position.x + this._velocity.x * timeDelta,
-                           this.position.y + this._velocity.y * timeDelta,
-                           this.position.z + this._velocity.z * timeDelta)
+    this._velocity.add(gravity.clone().multiplyScalar(timeDelta));
+    this._geo.position.add(this._velocity.clone().multiplyScalar(timeDelta));
 
     this._geo.rotation.set(this._geo.rotation.x + this._velocity.x * timeDelta,
                            this._geo.rotation.y + this._velocity.y * timeDelta,
-                           this._geo.rotation.z + this._velocity.z * timeDelta)
+                           this._geo.rotation.z + this._velocity.z * timeDelta);
   }
 }

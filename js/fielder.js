@@ -1,10 +1,8 @@
 import * as THREE from './three.module.js';
 
 export class Fielder {
-  // This belongs in an environment data pipeline.
-  static get centerField() {
-    return new THREE.Vector3(106.0, 0, 0);
-  }
+  static get centerField() {return new THREE.Vector3(106.0, 0, 0);}
+  static get cyclopianEyeHeight() {return new THREE.Vector3(0, 1.879, 0);}  // 6'2"
 
   constructor () {
     this._velocity = new THREE.Vector3(0, 0, 0);
@@ -16,9 +14,8 @@ export class Fielder {
   get inited() {return this._inited;}
   get fileLocation() {return this._fileLocation;}
   get rotation() {return this._rotation;}
-  get cyclopianEyeHeight() {return 1.879;}  // 6'2"
-  get cyclopianEyeLocation() {
-    return new THREE.Vector3(this.position.x, this.position.y+this.cyclopianEyeHeight, this.position.z);
+  get cyclopianEyePos() {
+    return this.position.clone().add(Fielder.cyclopianEyeHeight);
   }
 
   get position() {
@@ -30,7 +27,7 @@ export class Fielder {
 
   set position(pos) {
     if (this._geo) {
-      this._geo.position.set(pos.x, pos.y, pos.z);
+      this._geo.position.copy(pos);
     }
   }
 

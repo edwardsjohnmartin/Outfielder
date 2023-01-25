@@ -52,11 +52,10 @@ export class Camera {
 
   update(tickData) {
     var ballPos = tickData.get("ball").position;
-    var fielderPos = tickData.get("fielder").position;
     
     switch (this.which) {
     case Camera.fielder:
-      this._renderCamera.position.set(fielderPos.x, fielderPos.y, fielderPos.z);
+      this._renderCamera.position.copy(tickData.get("fielder").cyclopianEyePos);
       // Fall through
     case Camera.homePlate:
     case Camera.chase:
