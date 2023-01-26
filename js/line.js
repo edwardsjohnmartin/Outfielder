@@ -9,8 +9,8 @@ export class Line {
   
   init(scene, start, end, labelText) {
     const points = [];
-    points.push(new THREE.Vector3(start.x, start.y, start.z));
-    points.push(new THREE.Vector3(end.x, end.y, end.z));
+    points.push(start.clone());
+    points.push(end.clone());
     
     this._geo = new THREE.BufferGeometry().setFromPoints(points);
     this._geo.getAttribute('position').setUsage(THREE.DynamicDrawUsage);
