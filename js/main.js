@@ -15,6 +15,7 @@ var fielder = new Fielder();
 var ball = new Ball();
 var camera = new Camera();
 var pauseSim = false;
+var followCam = false;
 var simSpeed = 1.0;
 var label = new Label();
 var diagram = new Diagram();
@@ -171,9 +172,12 @@ function render() {
     fielder.update(tickData);
 
     // Controls/Camera
-    controls.target = ball.position.clone();
-    controls.update();
     camera.update(tickData);
+    controls.update();
+
+    if (followCam) {
+      controls.target = ball.position.clone();
+    }
 
     // Visualization (need latest camera)
     tickData.set("frustum", getFrustum(camera));  // All labels need this.
@@ -195,7 +199,6 @@ render();
 //
 document.getElementById('hit-direct').onclick = function() {
   batter.hitDirect(ball, Batter.direct, fielder.position);
-  label.release();
 }
 
 document.getElementById('hit-direct-long').onclick = function() {
@@ -214,6 +217,12 @@ document.getElementById('cameras').addEventListener("change", cameraChanged);
 document.getElementById('pause').addEventListener("change", (event) => {
   pauseSim = document.getElementById('pause').checked;
 });
+document.getElementById('follow').addEventListener("change", (event) => {
+  followCam = document.getElementById('follow').checked;
+  if (followCam) {
+    controls.target = ball.position.clone();
+  }
+});
 document.getElementById('sim-speed').addEventListener("change", (event) => {
   simSpeed = document.getElementById('sim-speed').value;
 });
@@ -221,7 +230,6 @@ window.addEventListener('resize', getCanvasRect);
 window.addEventListener('scroll', getCanvasRect);
 
 function cameraChanged() {
-  ball.reset();
   camera.which = parseInt(document.getElementById('cameras').value);
 }
 

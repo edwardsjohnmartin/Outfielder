@@ -62,7 +62,6 @@ export class Camera {
     case Camera.firstBase:
     case Camera.thirdBase:
     case Camera.fixed3:
-      this._renderCamera.lookAt(ballPos.x, ballPos.y, ballPos.z);
       break;
     }
   }

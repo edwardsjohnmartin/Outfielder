@@ -17,7 +17,7 @@ export class Ball {
     if (this._geo) {
       return this._geo.position;
     }
-    return null;
+    return new THREE.Vector3(0, 0, 0);
   }
 
   set position(pos) {
@@ -39,6 +39,7 @@ export class Ball {
   }
 
   hit(velocity) {
+    this.reset();
     this._velocity = velocity;
   }
 
