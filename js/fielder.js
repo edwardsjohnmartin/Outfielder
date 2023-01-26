@@ -1,7 +1,17 @@
 import * as THREE from './three.module.js';
+import {ObjectLabel} from './objectLabel.js';
+
+var outfielderDist = 106.0;
+var outfielderAngle = 30 * Math.PI / 180;
 
 export class Fielder {
   static get centerField() {return new THREE.Vector3(106.0, 0, 0);}
+  static get leftField() {
+    return new THREE.Vector3(outfielderDist*Math.cos(outfielderAngle), 0, -outfielderDist*Math.sin(outfielderAngle));
+  }
+  static get rightField() {
+    return new THREE.Vector3(outfielderDist*Math.cos(outfielderAngle), 0, outfielderDist*Math.sin(outfielderAngle));
+  }
   static get cyclopianEyeHeight() {return new THREE.Vector3(0, 1.879, 0);}  // 6'2"
 
   constructor () {
@@ -9,6 +19,7 @@ export class Fielder {
     this._rotation = new THREE.Vector3(0, 0, 0);
     this._fileLocation = "assets/characters/lowpoly_dude.glb";
     this._inited = false;
+    this._label = new ObjectLabel();
   }
 
   get inited() {return this._inited;}
@@ -43,8 +54,10 @@ export class Fielder {
     this._geo = geo;
     this._inited = true;
     this.lookAt = new THREE.Vector3(-1, 0, 0);
+    this._label.init(geo, "Hoopdy");
   }
 
   update(tickData) {
+    this._label.update(tickData);
   }
 }

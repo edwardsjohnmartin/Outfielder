@@ -1,15 +1,13 @@
 import * as THREE from './three.module.js';
 import {LineLabel} from './lineLabel.js';
 
-export class Line extends LineLabel {
+export class Line {
   constructor () {
-    super();
+    this._label = new LineLabel();
     this._geo = null;
   }
   
   init(scene, start, end, labelText) {
-    super.init(labelText);
-      
     const points = [];
     points.push(start.clone());
     points.push(end.clone());
@@ -20,6 +18,8 @@ export class Line extends LineLabel {
     var line = new THREE.Line(this._geo, new THREE.LineBasicMaterial({color:0xffffff}));
     line.frustumCulled = false;
     scene.add(line);
+
+    this._label.init(labelText);
   }
   
   update(start, end, tickData) {
@@ -27,6 +27,6 @@ export class Line extends LineLabel {
     position.setXYZ(0, start.x, start.y, start.z);
     position.setXYZ(1, end.x, end.y, end.z);
     position.needsUpdate = true;
-    super.update(start, end, tickData);
+    this._label.update(start, end, tickData);
   }
 }

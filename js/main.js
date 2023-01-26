@@ -5,7 +5,6 @@ import {Ball} from './ball.js';
 import {Fielder} from './fielder.js';
 import {Batter} from './batter.js';
 import {Camera} from './camera.js';
-import {Label} from './label.js';
 import {Diagram} from './diagram.js';
 
 var scene, renderer, controls, clock, sceneInited;
@@ -17,7 +16,6 @@ var camera = new Camera();
 var pauseSim = false;
 var followCam = false;
 var simSpeed = 1.0;
-var label = new Label();
 var diagram = new Diagram();
 
 var canvas;
@@ -102,10 +100,8 @@ function initScene() {
   loader.load(fielder.fileLocation, function(gltf) {
     scene.add(gltf.scene);
     fielder.init(gltf.scene);
-    fielder.position = Fielder.centerField;
+    fielder.position = Fielder.rightField;
 
-    label.initWithAnchor(gltf.scene, "Hoopdy"); // Label for the fielder
-    
     if (envInited && ball.inited && fielder.inited) {
       sceneInited = true;
     }
@@ -169,7 +165,6 @@ function render() {
     if (!pauseSim) {
       ball.update(tickData);
     }
-    fielder.update(tickData);
 
     // Controls/Camera
     camera.update(tickData);
@@ -181,7 +176,7 @@ function render() {
 
     // Visualization (need latest camera)
     tickData.set("frustum", getFrustum(camera));  // All labels need this.
-    label.update(tickData);
+    fielder.update(tickData);
     diagram.update(tickData);
   }
   renderer.render(scene, camera.renderCamera);
