@@ -6,6 +6,10 @@ export class Line {
     this._label = new LineLabel();
     this._geo = null;
   }
+
+  initOrigin(scene, labelText) {
+    this.init(scene, new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0), labelText);
+  }
   
   init(scene, start, end, labelText) {
     const points = [];

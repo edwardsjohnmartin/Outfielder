@@ -54,7 +54,7 @@ export class Fielder {
     this._geo = geo;
     this._inited = true;
     this.lookAt = new THREE.Vector3(-1, 0, 0);
-    this._label.init(geo, "Hoopdy");
+//    this._label.init(geo, "Hoopdy");
   }
 
   update(tickData) {
