@@ -1,6 +1,7 @@
 import * as THREE from './three.module.js';
 import {Line} from './line.js';
 import {Arrow} from './arrow.js';
+import {Point} from './point.js';
 
 export class Diagram {
   constructor () {
@@ -12,7 +13,12 @@ export class Diagram {
     for (let i = 0; i < 8; i++) {
       this._otherLines.push(new Line());
     }
-  }
+
+    this._points = [];
+    for (let i = 0; i < 5; i++) {
+      this._points.push(new Point());
+    }
+}
   
   init(scene) {
     this._r.init(scene, "r");
@@ -21,6 +27,8 @@ export class Diagram {
 
     this._otherLines.forEach(line => line.initOrigin(scene));
 
+    this._points[3].init(scene, 'D');
+    this._points[4].init(scene, 'E');
     //    this.debugLines(scene);
   }
   
@@ -32,6 +40,23 @@ export class Diagram {
     this._rPrime.update(cyclopianEyePos, ballPos, tickData);
     this._R.update(new THREE.Vector3(0, 0, 0), cyclopianEyePos, tickData);
 
+    this.updatePoints(tickData, ballPos, cyclopianEyePos);
+    this.updateLines(tickData, ballPos, cyclopianEyePos);
+  }
+
+  updatePoints(tickData, ballPos, cyclopianEyePos) {
+    this._D = ballPos.clone();
+    this._D.y = cyclopianEyePos.y;
+    this._points[3].position = this._D;
+    this._points[3].update(tickData);
+    
+    this._E = this._D.clone();
+    this._E.z = cyclopianEyePos.z;
+    this._points[4].position = this._E;
+    this._points[4].update(tickData);
+  }
+
+  updateLines(tickData, ballPos, cyclopianEyePos) {
     { // Line 1
       let line = this._otherLines[0];
       let pos = ballPos.clone();
@@ -40,14 +65,10 @@ export class Diagram {
     }
     { // Line 2
       let line = this._otherLines[1];
-      this._D = ballPos.clone();
-      this._D.y = cyclopianEyePos.y;
       line.update(this._D, cyclopianEyePos, tickData);
     }
     { // Line 3
       let line = this._otherLines[2];
-      this._E = this._D.clone();
-      this._E.z = cyclopianEyePos.z;
       line.update(this._D, this._E, tickData);
     }
     { // Line 4
@@ -72,9 +93,6 @@ export class Diagram {
       pos.z = 0;
       line.update(cyclopianEyePos, pos, tickData);
     }*/
-  }
-
-  setPoints(ballPos, cyclopianEyePos) {
   }
 
   debugLines(scene) {
