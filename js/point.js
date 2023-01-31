@@ -1,7 +1,7 @@
-import * as THREE from './three.module.js';
+import * as THREE from './libs/three.module.js';
 import {ObjectLabel} from './objectLabel.js';
 
-export class Point {
+export class Point_UNUSED {
   constructor () {
     this._geo = null;
     this._radius = .33;

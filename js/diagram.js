@@ -1,7 +1,8 @@
-import * as THREE from './three.module.js';
+import * as THREE from './libs/three.module.js';
 import {Line} from './line.js';
 import {Arrow} from './arrow.js';
-import {Point} from './point.js';
+import {Label} from './label.js';
+import {Angle} from './angle.js';
 
 export class Diagram {
   constructor () {
@@ -16,8 +17,11 @@ export class Diagram {
 
     this._points = [];
     for (let i = 0; i < 5; i++) {
-      this._points.push(new Point());
+      this._points.push(new Label());
     }
+
+    this._angles = [];
+    this._angles.push(new Angle());
 }
   
   init(scene) {
@@ -27,8 +31,15 @@ export class Diagram {
 
     this._otherLines.forEach(line => line.initOrigin(scene));
 
-    this._points[3].init(scene, 'D');
-    this._points[4].init(scene, 'E');
+    this._points[0].init('A');
+    this._points[0].position = new THREE.Vector3(0, 0, 0);
+    this._points[1].init('B');
+    this._points[2].init('C');
+    this._points[3].init('D');
+    this._points[4].init('E');
+
+    this._angles[0].init(scene, "alpha");
+
     //    this.debugLines(scene);
   }
   
@@ -42,18 +53,39 @@ export class Diagram {
 
     this.updatePoints(tickData, ballPos, cyclopianEyePos);
     this.updateLines(tickData, ballPos, cyclopianEyePos);
+    this.updateAngles(tickData, ballPos, cyclopianEyePos);
+  }
+
+  updateAngles(tickData, ballPos, cyclopianEyePos) {
+    var vector1 = this._D.clone().sub(cyclopianEyePos);
+    var vector2 = ballPos.clone().sub(cyclopianEyePos);
+    var angle = this._angles[0];
+
+    angle.position = cyclopianEyePos;
+    angle.forward = vector1;
+    angle.right = vector1.clone().cross(vector2);
+    angle.radius = vector2.length() / 5;
+    angle.angle = vector1.angleTo(vector2);
+    angle.update(tickData);
+
+    
+//    vector2.set(-1, cyclopianEyePos.y, 0);
+//    var psi = vector1.angleTo(vector2);
   }
 
   updatePoints(tickData, ballPos, cyclopianEyePos) {
+    this._points[1].position = ballPos.clone();
+    this._points[2].position = cyclopianEyePos.clone();
+
     this._D = ballPos.clone();
     this._D.y = cyclopianEyePos.y;
     this._points[3].position = this._D;
-    this._points[3].update(tickData);
     
     this._E = this._D.clone();
     this._E.z = cyclopianEyePos.z;
     this._points[4].position = this._E;
-    this._points[4].update(tickData);
+
+    this._points.forEach(point => point.update(tickData));
   }
 
   updateLines(tickData, ballPos, cyclopianEyePos) {

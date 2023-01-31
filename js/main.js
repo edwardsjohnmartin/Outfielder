@@ -1,6 +1,6 @@
-import * as THREE from './three.module.js';
-import {GLTFLoader} from './GLTFLoader.js';
-import {OrbitControls} from './OrbitControls.js';
+import * as THREE from './libs/three.module.js';
+import {GLTFLoader} from './libs/GLTFLoader.js';
+import {OrbitControls} from './libs/OrbitControls.js';
 import {Ball} from './ball.js';
 import {Fielder} from './fielder.js';
 import {Batter} from './batter.js';
@@ -110,7 +110,7 @@ function initScene() {
   });
 
 // AxesHelper
-  scene.add(new THREE.AxesHelper(5));
+//  scene.add(new THREE.AxesHelper(5));
 
   initSkybox();
   initLights();

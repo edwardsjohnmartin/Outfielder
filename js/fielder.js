@@ -1,4 +1,4 @@
-import * as THREE from './three.module.js';
+import * as THREE from './libs/three.module.js';
 import {ObjectLabel} from './objectLabel.js';
 
 var outfielderDist = 106.0;

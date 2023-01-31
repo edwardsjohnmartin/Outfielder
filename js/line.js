@@ -1,4 +1,4 @@
-import * as THREE from './three.module.js';
+import * as THREE from './libs/three.module.js';
 import {LineLabel} from './lineLabel.js';
 
 export class Line {

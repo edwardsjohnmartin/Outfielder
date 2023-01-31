@@ -1,4 +1,4 @@
-import * as THREE from './three.module.js';
+import * as THREE from './libs/three.module.js';
 import {Label} from './label.js';
 
 // Should refactor this and LineLabel to push more out of the Line class and also subclass Line.
