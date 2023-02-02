@@ -14,7 +14,6 @@ var fielder = new Fielder();
 var ball = new Ball();
 var camera = new Camera();
 var pauseSim = false;
-var followCam = false;
 var simSpeed = 1.0;
 var diagram = new Diagram();
 
@@ -159,6 +158,7 @@ function render() {
   tickData.set("ball", ball);
   tickData.set("camera", camera);
   tickData.set("canvasRect", canvasRect);
+  tickData.set("controls", controls);
   
   if (sceneInited) {
     // Sim elements
@@ -170,9 +170,9 @@ function render() {
     camera.update(tickData);
     controls.update();
 
-    if (followCam) {
-      controls.target = ball.position.clone();
-    }
+//    if (followCam) {
+//      controls.target = ball.position.clone();
+//    }
 
     // Visualization (need latest camera)
     tickData.set("frustum", getFrustum(camera));  // All labels need this.
@@ -209,23 +209,28 @@ document.getElementById('hit-random').onclick = function() {
 }
 
 document.getElementById('cameras').addEventListener("change", cameraChanged);
+document.getElementById('lookat').addEventListener("change", (event) => {
+  camera.look = event.target.value;
+});
 document.getElementById('pause').addEventListener("change", (event) => {
-  pauseSim = document.getElementById('pause').checked;
+  pauseSim = event.target.checked;
 });
-document.getElementById('follow').addEventListener("change", (event) => {
-  followCam = document.getElementById('follow').checked;
-  if (followCam) {
-    controls.target = ball.position.clone();
-  }
-});
+
 document.getElementById('sim-speed').addEventListener("change", (event) => {
-  simSpeed = document.getElementById('sim-speed').value;
+  simSpeed = event.target.value;
 });
 window.addEventListener('resize', getCanvasRect);
 window.addEventListener('scroll', getCanvasRect);
 
-function cameraChanged() {
-  camera.which = parseInt(document.getElementById('cameras').value);
+function cameraChanged(event) {
+  var val;
+  if (event) {
+    val = event.target.value;
+  }
+  else {
+    val = document.getElementById('cameras').value;
+  }
+  camera.which = parseInt(val);
 }
 
 function getCanvasRect() {

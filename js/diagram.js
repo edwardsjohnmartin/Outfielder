@@ -21,12 +21,13 @@ export class Diagram {
     }
 
     this._angles = [];
-    this._angles.push(new Angle());
+    this._angles.push(new Angle()); // Alpha
+    this._angles.push(new Angle()); // Psi
 }
   
   init(scene) {
     this._r.init(scene, "r");
-    this._rPrime.init(scene, "r'");
+    this._rPrime.init(scene, "L");
     this._R.init(scene, "R");
 
     this._otherLines.forEach(line => line.initOrigin(scene));
@@ -39,6 +40,7 @@ export class Diagram {
     this._points[4].init('E');
 
     this._angles[0].init(scene, "alpha");
+    this._angles[1].init(scene, "psi");
 
     //    this.debugLines(scene);
   }
@@ -57,20 +59,24 @@ export class Diagram {
   }
 
   updateAngles(tickData, ballPos, cyclopianEyePos) {
+    // Alpha
     var vector1 = this._D.clone().sub(cyclopianEyePos);
     var vector2 = ballPos.clone().sub(cyclopianEyePos);
-    var angle = this._angles[0];
+    this.updateAngle(tickData, this._angles[0], cyclopianEyePos, vector1, vector2);
 
-    angle.position = cyclopianEyePos;
+    // Psi
+    vector1 = this._E.clone().sub(cyclopianEyePos);
+    vector2 = this._D.clone().sub(cyclopianEyePos);
+    this.updateAngle(tickData, this._angles[1], cyclopianEyePos, vector1, vector2);
+  }
+
+  updateAngle(tickData, angle, position, vector1, vector2) {
+    angle.position = position;
     angle.forward = vector1;
     angle.right = vector1.clone().cross(vector2);
     angle.radius = vector2.length() / 5;
     angle.angle = vector1.angleTo(vector2);
     angle.update(tickData);
-
-    
-//    vector2.set(-1, cyclopianEyePos.y, 0);
-//    var psi = vector1.angleTo(vector2);
   }
 
   updatePoints(tickData, ballPos, cyclopianEyePos) {

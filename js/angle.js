@@ -34,7 +34,9 @@ export class Angle {
       this._geo.clear();
     }
 
-    const curve = new THREE.EllipseCurve(0,  0, this._radius, this._radius, 0, this._angle, false, 0);
+    var offset = this._right.y < 0 ? Math.PI : 0; // This works in right field but not left field.
+
+    const curve = new THREE.ArcCurve(0,  0, this._radius, offset, offset+this._angle, false, 0);
     this._geo = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(20)),
                                new THREE.LineBasicMaterial({color: 0x0000ff}))
     this._geo.frustumCulled = false;
