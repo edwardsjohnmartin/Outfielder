@@ -34,7 +34,7 @@ export class Angle {
       this._geo.clear();
     }
 
-    var offset = this._right.y < 0 ? Math.PI : 0; // This works in right field but not left field.
+    var offset = this._right.y < 0 ? Math.PI : 0; // This works when the ball has a lower z value than the fielder
 
     const curve = new THREE.ArcCurve(0,  0, this._radius, offset, offset+this._angle, false, 0);
     this._geo = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(20)),

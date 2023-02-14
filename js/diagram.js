@@ -60,22 +60,22 @@ export class Diagram {
 
   updateAngles(tickData, ballPos, cyclopianEyePos) {
     // Alpha
-    var vector1 = this._D.clone().sub(cyclopianEyePos);
-    var vector2 = ballPos.clone().sub(cyclopianEyePos);
-    this.updateAngle(tickData, this._angles[0], cyclopianEyePos, vector1, vector2);
+    var p1 = this._D.clone().sub(cyclopianEyePos);
+    var p2 = ballPos.clone().sub(cyclopianEyePos);
+    this.updateAngle(tickData, this._angles[0], cyclopianEyePos, p1, p2);
 
     // Psi
-    vector1 = this._E.clone().sub(cyclopianEyePos);
-    vector2 = this._D.clone().sub(cyclopianEyePos);
-    this.updateAngle(tickData, this._angles[1], cyclopianEyePos, vector1, vector2);
+    p1 = this._E.clone().sub(cyclopianEyePos);
+    p2 = this._D.clone().sub(cyclopianEyePos);
+    this.updateAngle(tickData, this._angles[1], cyclopianEyePos, p1, p2);
   }
 
-  updateAngle(tickData, angle, position, vector1, vector2) {
-    angle.position = position;
-    angle.forward = vector1;
-    angle.right = vector1.clone().cross(vector2);
-    angle.radius = vector2.length() / 5;
-    angle.angle = vector1.angleTo(vector2);
+  updateAngle(tickData, angle, p0, p1, p2) {
+    angle.position = p0;
+    angle.forward = p1;
+    angle.right = p1.clone().cross(p2);
+    angle.radius = p2.length() / 5;
+    angle.angle = p1.angleTo(p2);
     angle.update(tickData);
   }
 

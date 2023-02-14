@@ -188,6 +188,30 @@ function render() {
 init();
 render();
 
+//sandbox();
+
+//=============================
+//  Sandbox to play in!
+//
+function sandbox() {
+  var v1 = new THREE.Vector3(1, 0, 0);
+  var v2 = new THREE.Vector3(0, 1, 0);
+  var v3 = new THREE.Vector3(-1, 0, 0);
+  var v4 = new THREE.Vector3(0, -1, 0);
+  var v5 = new THREE.Vector3(1, 1, 0);
+  var v6 = new THREE.Vector3(-1, 1, 0);
+  var v7 = new THREE.Vector3(-1, -1, 0);
+  var v8 = new THREE.Vector3(1, -1, 0);
+
+  console.log(v1.angleTo(v1));
+  console.log(v1.angleTo(v2));
+  console.log(v1.angleTo(v3));
+  console.log(v1.angleTo(v4));
+  console.log(v1.angleTo(v5));
+  console.log(v1.angleTo(v6));
+  console.log(v1.angleTo(v7));
+  console.log(v1.angleTo(v8));
+}
 
 //==============================
 // Listeners
@@ -197,15 +221,15 @@ document.getElementById('hit-direct').onclick = function() {
 }
 
 document.getElementById('hit-direct-long').onclick = function() {
-  batter.hitDirect(ball, Batter.directLong);
+  batter.hitDirect(ball, Batter.directLong, fielder.position);
 }
 
 document.getElementById('hit-direct-short').onclick = function() {
-  batter.hitDirect(ball, Batter.directShort);
+  batter.hitDirect(ball, Batter.directShort, fielder.position);
 }
 
 document.getElementById('hit-random').onclick = function() {
-  batter.hit(ball);
+  batter.hit(ball, Batter.direct, fielder.position);
 }
 
 document.getElementById('cameras').addEventListener("change", cameraChanged);

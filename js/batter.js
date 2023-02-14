@@ -21,12 +21,28 @@ export class Batter {
   static get directShort() {return 2;}
 
 
+  //-------------------------------
+  // A more general hit.
+  //
+  hit(ball, distance, fielderPos) {
+    var targetPos = fielderPos.clone();
+    var up = new THREE.Vector3(0, 1, 0);
+    var v1 = targetPos.clone().normalize();
+    if (true) {
+      targetPos.add(v1.cross(up).multiplyScalar(10)); // left of fielder
+    }
+    else {
+      targetPos.add(up.cross(v1).multiplyScalar(10)); // right of fielder
+    }
+    this.hitDirect(ball, distance, targetPos);
+  }
+  
   //---------------------------------------------------------------
   // Need to run the simulation. Grab the hit angle from the UI,
   // then calculate off the bat speed.
   // This is easy while we're doing simple trajectory physics.
   hitDirect(ball, distance, targetPos) {
-    var hitAngle = 30. * Math.PI / 180.; // from horizontal
+    var elevAngle = 30. * Math.PI / 180.; // from horizontal
     var hitSpeed;
 
     switch(distance) {
@@ -38,14 +54,20 @@ export class Batter {
       hitSpeed = 33.7;
       break;
     case Batter.direct:
-      hitSpeed = this.getHitSpeed(hitAngle, targetPos);
+      hitSpeed = this.getHitSpeed(elevAngle, targetPos);
       break;
     default:
       hitSpeed = 22.0;
     }
       
     ball.reset();
-    ball.hit(new THREE.Vector3(hitSpeed*Math.cos(hitAngle), hitSpeed*Math.sin(hitAngle), 0));
+    var horizontalComponent = hitSpeed*Math.cos(elevAngle);
+    var launchDir = targetPos.clone();
+    launchDir.y = 0;
+    launchDir.normalize().multiplyScalar(horizontalComponent);
+    launchDir.y = hitSpeed*Math.sin(elevAngle);
+    
+    ball.hit(launchDir);
   }
 
   //------------------------------------------
@@ -53,13 +75,13 @@ export class Batter {
   //
   //  http://hyperphysics.phy-astr.gsu.edu/hbase/traj.html#tra13
   //
-  getHitSpeed(hitAngle, targetPos) {
+  getHitSpeed(elevAngle, targetPos) {
     // Hit is from 0, 0
     // Assuming bat location and catch location is the same elevation
     var range = targetPos.length();
     var gravity = 9.81; // m / s**2
 
-    return Math.sqrt(range * gravity / Math.sin(2 * hitAngle));
+    return Math.sqrt(range * gravity / Math.sin(2 * elevAngle));
   }
 
   update(timeDelta) {
