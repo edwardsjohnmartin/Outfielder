@@ -16,6 +16,7 @@ var camera = new Camera();
 var pauseSim = false;
 var simSpeed = 1.0;
 var diagram = new Diagram();
+var ballData = null;
 
 var canvas;
 var canvasRect;
@@ -37,6 +38,7 @@ function init() {
   diagram.init(scene);
   initControls();
   clock = new THREE.Clock();
+
 }
 
 function initControls() {
