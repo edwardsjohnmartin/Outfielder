@@ -1,8 +1,26 @@
+const NMAX = 1000;
+
 // Module scope
-/*
-common/ball/t,x,y,z,vx,vy,vz,v,h,n;
-common/fielder/xx,yy,vvx,vvy,vv;
-*/
+// Ball
+var t = Array(NMAX).fill(0.0);
+var x = Array(NMAX).fill(0.0);
+var y = Array(NMAX).fill(0.0);
+var z = Array(NMAX).fill(0.0);
+
+var vx = Array(NMAX).fill(0.0);
+var vy = Array(NMAX).fill(0.0);
+var vz = Array(NMAX).fill(0.0);
+var v = Array(NMAX).fill(0.0);
+
+var h, n;
+
+// Fielder
+var xx = init_2darray(4, NMAX, 0.0);
+var yy = init_2darray(4, NMAX, 0.0);
+var vvx = init_2darray(4, NMAX, 0.0);
+var vvy = init_2darray(4, NMAX, 0.0);
+var vv = init_2darray(4, NMAX, 0.0);
+
 
 function init_2darray(n, m, val) {
   var arr = Array(n);
@@ -16,32 +34,17 @@ export function Outfielder() {
 
   // declarations
   var m, circ, vmph, theta, phi, phifinal, k, a, area, dd, alpha, rr, ttilde, gamm, Vprime;
-  var tau, tau0, tau1, tau2, dt, tempF, elevft, RH, pressurein, beta, pi, h, hmax, phiR, tmax, dmax;
+  var tau, tau0, tau1, tau2, dt, tempF, elevft, RH, pressurein, beta, pi, hmax, phiR, tmax, dmax;
   var wb, wg, ws, temp, elev, pressure, SVP, rhoSI, rhoI, tc, xc, yc, zc, psi;
   var wx, wy, wz, w, wpar, wperp, g, Cd, Cm, S, ax, ay, az, ww;
   var deltaphi0, xx0, yy0, Vtmax, Vt, phiTP, rad, ds;
   var dptplane, ang, deltat;
-  var b, i, n, c, ic, n0;
-
-  const NMAX = 1000;
+  var b, i, c, ic, n0;
 
   // arrays
-  var t = Array(NMAX).fill(0.0);
-  var x = Array(NMAX).fill(0.0);
-  var y = Array(NMAX).fill(0.0);
-  var z = Array(NMAX).fill(0.0);
   var d = Array(NMAX).fill(0.0);
-  var vx = Array(NMAX).fill(0.0);
-  var vy = Array(NMAX).fill(0.0);
-  var vz = Array(NMAX).fill(0.0);
-  var v = Array(NMAX).fill(0.0);
-  var xx = init_2darray(3, NMAX, 0.0);
-  var yy = init_2darray(3, NMAX, 0.0);
-  var vvx = init_2darray(3, NMAX, 0.0);
-  var vvy = init_2darray(3, NMAX, 0.0);
-  var vv = init_2darray(3, NMAX, 0.0);
-  var Dist = Array(3).fill(0.0);
-  var Vave = Array(3).fill(0.0);
+  var dist = Array(4).fill(0.0);
+  var vave = Array(4).fill(0.0);
 
   // calculation inputs
 
@@ -71,7 +74,7 @@ export function Outfielder() {
   tau2 = 1.5;        // initial time delay constant 2 (s)
   deltaphi0 = 5.0;    // angle spread delta phi_0 for initial response time calculation (deg)
   gamm = 1.0;        // fielder sprint time constant (gamma, 1/s)
-  //    Vtmax = 1000000.0;   // maximum terminal velocity of fielder (ft/s)
+  //Vtmax = 1000000.0;   // maximum terminal velocity of fielder (ft/s)
   Vtmax = 30.0;      // maximum terminal velocity of fielder (ft/s)
   
   // field inputs
@@ -162,36 +165,34 @@ export function Outfielder() {
       d[i] = Math.sqrt(xc**2+yc**2);                    // ball horizontal distance from home plate at time of catch
       ang = Math.abs(phifinal-phi)*pi/180;
       dptplane = d[i]*Math.sin(ang);                    // distance from landing point to initial plane of motion
-//      console.log(tc, d[i], hmax, tmax, dmax, phifinal, xc, yc, wb, ws, dptplane);
     }
   }
 
-  return {t, x, y, z, tc};
 
   // fielder initializations
-/*
+
   n = tau/dt;                                            // number of time steps of response time (hundredths of a second for dt = 0.01 s)
   phiR = Math.atan2(xx0,yy0)*180.0/pi;                       // bearing angle of initial position vector of fielder (deg)
-  tau0 = tau1 + tau2*Math.exp(-(phiR-phi)**2/deltaphi0**2);   // initial time delay (s)
+  tau0 = tau1 + tau2*Math.exp((-(phiR-phi))**2/deltaphi0**2);   // initial time delay (s)
   n0 = tau0/dt;                                          // number of time steps of initial time delay (hundredths of a second for dt = 0.01 s)
   if (n+n0 > NMAX) {
     console.log("n+n0 > NMAX");
     return;
   }
-  if (z(n0) < h) { // hold the fielder stationary until the ball is at or above the horizontal direction
+  if (z[n0] < h) { // hold the fielder stationary until the ball is at or above the horizontal direction
     i = 1;
-    while (z(n0+i) < h) {
+    while (z[n0+i] < h) {
       i = i + 1;
     }
     n0 = n0 + i; // increase the initial delay time n0 so that the z(n0) is greater than or equal to h
   }
   for(c = 1; c <= 3; c++) {    // keep the fielder at his initial position during the response time and the initial delay time
-    dist(c) = 0.0;
+    dist[c] = 0.0;
     for (i = 0; i <= n + n0; i++) {
-      xx(c,i) = xx0;
-      yy(c,i) = yy0;
-      vvx(c,i) = 0.0;
-      vvy(c,i) = 0.0;
+      xx[c][i] = xx0;
+      yy[c][i] = yy0;
+      vvx[c][i] = 0.0;
+      vvy[c][i] = 0.0;
     }
   }
 
@@ -209,54 +210,58 @@ export function Outfielder() {
 
   for (i = n + n0 + 1; i <= ic; i++) {
     rr = Vt*(t[i]-ttilde) + Vt*(Math.exp(-gamm*(t[i]-ttilde)) - 1.0)/gamm;
-    vv(c,i) = Vt*(1-Math.exp(-gamm*(t[i]-ttilde)));
-    xx(c,i) = xx0 + rr*Math.sin(phiTP);
-    yy(c,i) = yy0 + rr*Math.cos(phiTP);
-    vvx(c,i) = vv(c,i)*Math.sin(phiTP);
-    vvy(c,i) = vv(c,i)*Math.cos(phiTP);
+    vv[c][i] = Vt*(1-Math.exp(-gamm*(t[i]-ttilde)));
+    xx[c][i] = xx0 + rr*Math.sin(phiTP);
+    yy[c][i] = yy0 + rr*Math.cos(phiTP);
+    vvx[c][i] = vv[c][i]*Math.sin(phiTP);
+    vvy[c][i] = vv[c][i]*Math.cos(phiTP);
   }
-  Dist(c) = Math.sqrt((xx(c,ic)-xx0)**2 + (yy(c,ic)-yy0)**2);
-  Vave(c) = Dist(c)/(tc-ttilde);
+  dist[c] = Math.sqrt((xx[c][ic]-xx0)**2 + (yy[c][ic]-yy0)**2);
+  vave[c] = dist[c]/(tc-ttilde);
     
 
   //---------------------------------------
   // determine OAC (c = 2) and AAC (c = 3) fielder motion
     
-    do c = 2, 3
-      i = n + n0                                        // time when fielder starts accelerating from rest
-      call setangles(c,i,ww,psi,alpha)
-      do i = n + n0 + 1, ic
-        if (c .eq. 2) then
-          alpha = alpha + ww*(t[i]-t[i-1])*(Math.cos(alpha))**2
-        else
-          alpha = alpha + ww*(t[i]-t[i-1])
-        endif
-        dd = (z(i-n)-h)/Math.tan(alpha)                      // new fielder-ball distance
-        xx(c,i) = x(i-n) + dd*Math.sin(psi)                  // new fielder position
-        yy(c,i) = y(i-n) + (xx(c,i)-x(i-n))/Math.tan(psi)
-        vvx(c,i) = (xx(c,i)-xx(c,i-1))/(t[i]-t[i-1])    // new fielder velocity
-        vvy(c,i) = (yy(c,i)-yy(c,i-1))/(t[i]-t[i-1])
-        vv(c,i) = Math.sqrt(vvx(c,i)**2 + vvy(c,i)**2)
-        deltat = t[i]-t[i-1]
-        if (vv(c,i).gt.vv(c,i-1)) then                  // fielder speed is increasing with time
-          Vprime = Vtmax - (Vtmax-vv(c,i-1))*Math.exp(-gamm*(t[i]-t[i-1]))
-          if (vv(c,i).gt.Vprime) then
-            call scalecoordinates(c,i,deltat,Vprime)
-            call setangles(c,i,ww,psi,alpha)
-          endif
-        else                                            // fielder speed is decreasing with time
-          Vprime = Vtmax - (Vtmax-vv(c,i-1))*Math.exp(gamm*(t[i]-t[i-1]))
-          if (vv(c,i).lt.Vprime) then
-            call scalecoordinates(c,i,deltat,Vprime)
-            call setangles(c,i,ww,psi,alpha)
-          endif
-        endif
-        Dist(c) = Dist(c) + Math.sqrt((xx(c,i)-xx(c,i-1))**2 + (yy(c,i)-yy(c,i-1))**2)
-      enddo
-      Vave(c) = Dist(c)/(tc-ttilde)
-    enddo
-*/
-// output results
+  for (c = 2; c <= 3; c++) {
+    i = n + n0;
+    [ww, psi, alpha] = setangles(c,i);
+    for (i = n + n0 + 1; i <= ic; i++) {
+      if (c == 2) {
+        alpha = alpha + ww*(t[i]-t[i-1])*(Math.cos(alpha))**2;
+      }
+      else {
+        alpha = alpha + ww*(t[i]-t[i-1]);
+      }
+      dd = (z[i-n]-h)/Math.tan(alpha);
+      xx[c][i] = x[i-n] + dd*Math.sin(psi);
+      yy[c][i] = y[i-n] + (xx[c][i]-x[i-n])/Math.tan(psi);
+      vvx[c][i] = (xx[c][i]-xx[c][i-1])/(t[i]-t[i-1]);
+      vvy[c][i] = (yy[c][i]-yy[c][i-1])/(t[i]-t[i-1]);
+      vv[c][i] = Math.sqrt(vvx[c][i]**2 + vvy[c][i]**2);
+      deltat = t[i]-t[i-1];
+      if (vv[c][i] > vv[c][i-1]) {
+        Vprime = Vtmax - (Vtmax-vv[c][i-1])*Math.exp(-gamm*(t[i]-t[i-1]));
+        if (vv[c][i] > Vprime) { 
+          scalecoordinates(c,i,deltat,Vprime);
+          [ww, psi, alpha] = setangles(c,i);
+        }
+        else {
+          Vprime = Vtmax - (Vtmax-vv[c][i-1])*Math.exp(gamm*(t[i]-t[i-1]));
+          if (vv[c][i].lt.Vprime) {
+            scalecoordinates(c,i,deltat,Vprime);
+            [ww, psi, alpha] = setangles(c,i);
+          }
+        }
+        dist[c] = dist[c] + Math.sqrt((xx[c][i]-xx[c][i-1])**2 + (yy[c][i]-yy[c][i-1])**2);
+      }
+      vave[c] = dist[c]/(tc-ttilde);
+    }
+  }
+
+  return {t, x, y, z, tc, xx, yy};
+
+  // output results
 /*
   for (c = 1; c <= 3; c++) {
     write (*,'(90(f12.6,","))') Dist(c), Vave(c)
@@ -271,46 +276,29 @@ export function Outfielder() {
 */
 }
 
-  /*
-subroutine setangles(c,i,ww,psi,alpha)
-    implicit none
-    integer c, i, n, NMAX
-    parameter (NMAX=1000)                                           // allow for hang times of up to 10 seconds
-    var t(0:NMAX), x(0:NMAX), y(0:NMAX), z(0:NMAX)     // ball positions
-    var vx(0:NMAX), vy(0:NMAX), vz(0:NMAX), v(0:NMAX)  // ball velocities
-    var xx(3,0:NMAX), yy(3,0:NMAX)                     // fielder positions; 1 = TP, 2 = OAC, 3 = AAC
-    var vvx(3,0:NMAX), vvy(3,0:NMAX), vv(3,0:NMAX)     // fielder velocities
-    var dd, dddot, ll, ww, psi, alpha, h
-    common/ball/t,x,y,z,vx,vy,vz,v,h,n
-    common/fielder/xx,yy,vvx,vvy,vv
-    dd = Math.sqrt((x(i-n)-xx(c,i))**2 + (y(i-n)-yy(c,i))**2) // horizontal distance D between fielder and previous ball position
-    ll = Math.sqrt(dd**2 + (z(i-n)-h)**2) // total distance L between fielder and previous ball position
-    dddot = ((x(i-n)-xx(c,i))*(vx(i-n)-vvx(c,i)) + (y(i-n)-yy(c,i))*(vy(i-n)-vvy(c,i)))/dd // time derivative of D
-    if (c .eq. 2) then
-      ww = (vz(i-n)*dd - dddot*(z(i-n)-h))/dd**2 // OAC Omega based on previous position of ball and current position of fielder
-    else 
-      ww = (vz(i-n)*dd - dddot*(z(i-n)-h))/ll**2 // AAC Omega based on previous position of ball and current position of fielder
-    endif
-    psi = Math.atan2(xx(c,i)-x(i-n),yy(c,i)-y(i-n)) // azimuthal angle of ball based on ...
-    alpha = Math.atan2(z(i-n)-h,dd)                 // time-delayed elevation angle of ball based on ...
-    return
-    end
+function setangles(c,i) {
+  var dd, dddot, ll;
+  var ww, psi, alpha;
+  dd = Math.sqrt((x[i-n]-xx[c][i])**2 + (y[i-n]-yy[c][i])**2);
+  ll = Math.sqrt(dd**2 + (z[i-n]-h)**2);
+  dddot = ((x[i-n]-xx[c][i])*(vx[i-n]-vvx[c][i]) + (y[i-n]-yy[c][i])*(vy[i-n]-vvy[c][i]))/dd;
+  if (c == 2) {
+    ww = (vz[i-n]*dd - dddot*(z[i-n]-h))/dd**2;
+  }
+  else {
+    ww = (vz[i-n]*dd - dddot*(z[i-n]-h))/ll**2;
+  }
+  psi = Math.atan2(xx[c][i]-x[i-n],yy[c][i]-y[i-n]);
+  alpha = Math.atan2(z[i-n]-h,dd);
+  return [ww, psi, alpha];
+}
     
-subroutine scalecoordinates(c,i,deltat,Vprime)
-    implicit none
-    integer c, i, NMAX
-    parameter (NMAX=1000)                                           // allow for hang times of up to 10 seconds
-    var eta, Vprime, deltat
-    var xx(3,0:NMAX), yy(3,0:NMAX)                     // fielder positions; 1 = TP, 2 = OAC, 3 = AAC
-    var vvx(3,0:NMAX), vvy(3,0:NMAX), vv(3,0:NMAX)     // fielder velocities
-    common/fielder/xx,yy,vvx,vvy,vv
-    eta = Vprime/vv(c,i)
-    vv(c,i) = eta*vv(c,i)
-    vvx(c,i) = eta*vvx(c,i)
-    vvy(c,i) = eta*vvy(c,i)
-    xx(c,i) = xx(c,i-1) + deltat*vvx(c,i)
-    yy(c,i) = yy(c,i-1) + deltat*vvy(c,i)
-    return
-    end
 
-*/
+function scalecoordinates(c,i,deltat,Vprime) {
+  var eta = Vprime/vv[c][i];
+  vv[c][i] = eta*vv[c][i];
+  vvx[c][i] = eta*vvx[c][i];
+  vvy[c][i] = eta*vvy[c][i];
+  xx[c][i] = xx[c][i-1] + deltat*vvx[c][i];
+  yy[c][i] = yy[c][i-1] + deltat*vvy[c][i];
+}

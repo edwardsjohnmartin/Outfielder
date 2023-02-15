@@ -240,10 +240,13 @@ document.getElementById('lookat').addEventListener("change", (event) => {
 });
 document.getElementById('pause').addEventListener("change", (event) => {
   pauseSim = event.target.checked;
+  ball.pause = pauseSim;
+//  fielder.paused = pauseSim;
 });
 
 document.getElementById('sim-speed').addEventListener("change", (event) => {
   simSpeed = event.target.value;
+  ball.simSpeed = simSpeed;
 });
 window.addEventListener('resize', getCanvasRect);
 window.addEventListener('scroll', getCanvasRect);

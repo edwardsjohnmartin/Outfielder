@@ -10,6 +10,9 @@ export class Ball {
     this._inited = false;
     this._ballData = null;
     this._clock = null;
+    this._elapsedTime = 0;
+    this._pause = false;
+    this._simSpeed = 1.0;
   }
 
   get inited() {return this._inited;}
@@ -28,6 +31,21 @@ export class Ball {
     }
   }
 
+  set pause(p) {
+    this._pause = p;
+    if (!this._clock) { // Not running a ball sim.
+      return;
+    }
+    
+    if (p) {
+      this._elapsedTime = this._elapsedTime + this._clock.getElapsedTime();
+      this._clock.stop();
+    }
+    else {
+      this._clock.start();
+    }
+  }
+
   init(geo) {
     this._geo = geo;
     this._inited = true;
@@ -43,6 +61,7 @@ export class Ball {
     this.reset();
     this._ballData = Outfielder();
     this._clock = new THREE.Clock();
+    this._elapsedTime = 0;
     console.log(this._ballData);
   }
 
@@ -51,12 +70,10 @@ export class Ball {
       return;
     }
 
-//    this._velocity.add(gravity.clone().multiplyScalar(timeDelta));
-    //    this._geo.position.add(this._velocity.clone().multiplyScalar(timeDelta));
-    const elapsedTime = this._clock.getElapsedTime();
-    const i = elapsedTime*100 | 0;
+    const et = this._clock.getElapsedTime() + this._elapsedTime;
+    const i = et*100 | 0;
     
-    if (elapsedTime > this._ballData.tc) {
+    if (et > this._ballData.tc) {
       this._clock = null;
       return;
     }
