@@ -21,11 +21,8 @@ export class Batter {
   static get directShort() {return 2;}
 
 
-  //-------------------------------
-  // A more general hit.
-  //
-  hit(ball, distance, fielderPos) {
-    var targetPos = fielderPos.clone();
+  hit(ball, fielder, hitData) {
+    var targetPos = fielder.position.clone();
     var up = new THREE.Vector3(0, 1, 0);
     var v1 = targetPos.clone().normalize();
     if (true) {
@@ -34,7 +31,7 @@ export class Batter {
     else {
       targetPos.add(up.cross(v1).multiplyScalar(10)); // right of fielder
     }
-    this.hitDirect(ball, distance, targetPos);
+    this.hitDirect(ball, Batter.direct, targetPos);
   }
   
   //---------------------------------------------------------------
@@ -82,8 +79,5 @@ export class Batter {
     var gravity = 9.81; // m / s**2
 
     return Math.sqrt(range * gravity / Math.sin(2 * elevAngle));
-  }
-
-  update(timeDelta) {
   }
 }

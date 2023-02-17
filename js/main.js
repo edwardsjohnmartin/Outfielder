@@ -30,6 +30,8 @@ function init() {
   camera.init(canvasSize.x, canvasSize.y);
   cameraChanged();
   initRenderer();
+  document.getElementById('hit').disabled = true;
+  document.getElementById('randomize').disabled = true;
 
   canvas = document.getElementById('canvas-container');
   canvas.appendChild(renderer.domElement);
@@ -38,7 +40,6 @@ function init() {
   diagram.init(scene);
   initControls();
   clock = new THREE.Clock();
-
 }
 
 function initControls() {
@@ -84,10 +85,8 @@ function initScene() {
     scene.add(gltf.scene);
     ball.init(gltf.scene);
         
-    document.getElementById('hit-direct').disabled = false;
-    document.getElementById('hit-direct-long').disabled = false;
-    document.getElementById('hit-direct-short').disabled = false;
-    document.getElementById('hit-random').disabled = false;
+    document.getElementById('hit').disabled = false;
+//    document.getElementById('randomize').disabled = false;
 
     if (envInited && ball.inited && fielder.inited) {
       sceneInited = true;
@@ -218,20 +217,16 @@ function sandbox() {
 //==============================
 // Listeners
 //
-document.getElementById('hit-direct').onclick = function() {
-  batter.hitDirect(ball, Batter.direct, fielder.position);
+document.getElementById('hit').onclick = function() {
+  var hitData = {};
+  hitData.exitSpeed = document.getElementById('exit-speed').value;
+  hitData.theta = document.getElementById('exit-theta').value;
+  hitData.phi = document.getElementById('exit-phi').value;
+  hitData.handedness = document.getElementById('handedness').value;
+  batter.hit(ball, fielder, hitData);
 }
 
-document.getElementById('hit-direct-long').onclick = function() {
-  batter.hitDirect(ball, Batter.directLong, fielder.position);
-}
-
-document.getElementById('hit-direct-short').onclick = function() {
-  batter.hitDirect(ball, Batter.directShort, fielder.position);
-}
-
-document.getElementById('hit-random').onclick = function() {
-  batter.hit(ball, Batter.direct, fielder.position);
+document.getElementById('randomize').onclick = function() {
 }
 
 document.getElementById('cameras').addEventListener("change", cameraChanged);

@@ -20,6 +20,11 @@
         <div>
           <table>
             <tr>
+              <td colspan="2" class="center border-top">
+                <strong>Simulation</strong>
+              </td>
+            </tr>
+            <tr>
               <td class="right">
                 <label for="pause">Pause:</label>
               </td>
@@ -37,6 +42,11 @@
             </tr>
 
             <!-- Camera -->
+            <tr>
+              <td colspan="2" class="center border-top">
+                <strong>Camera</strong>
+              </td>
+            </tr>
             <tr>
               <td class="right">
                 <label for="cameras">Camera:</label>
@@ -66,14 +76,52 @@
             </tr>
             <!-- Hits -->
             <tr>
-              <td class="right">Hits:</td>
-              <td>
-                <button id="hit-direct">Direct</button>
-                <button id="hit-direct-long">Direct Long</button>
-                <button id="hit-direct-short">Direct Short</button>
-                <button id="hit-random">Random</button>
+              <td colspan="2" class="center border-top">
+                <strong>Hit data</strong>
               </td>
             </tr>
+            <tr>
+              <td class="right">
+                <label for="exit-speed">Exit speed (mph):</label>
+              </td>
+              <td>
+                <input type="number" id="exit-speed" min="50" max="200" value="100" step="10">
+              </td>
+            </tr>
+            <tr>
+              <td class="right">
+                <label for="exit-theta">theta (from horizontal):</label>
+              </td>
+              <td>
+                <input type="number" id="exit-theta" min="0" max="90" value="30" step="5">
+              </td>
+            </tr>
+            <tr>
+              <td class="right">
+                <label for="exit-phi">phi (from center field):</label>
+              </td>
+              <td>
+                <input type="number" id="exit-phi" min="-45" max="45" value="0" step="5">
+              </td>
+            </tr>
+            <tr>
+              <td class="right">
+                <label for="handedness">Handedness:</label>
+              </td>
+              <td>
+                <select id="handedness">
+                  <option value="1" selected>Right</option>
+                  <option value="-1">Left</option>
+                </select>
+              </td>
+            </tr>
+            <tr><td colspan="2" class="center">
+                <button id="randomize">Randomize</button>
+            </td></tr>
+            <tr><td colspan="2" class="center">
+                <button id="hit"><b>Hit</b></button>
+            </td></tr>
+            <tr><td colspan="2" class="center border-bottom"></td></tr>
           </table>
         </div>
       </td>

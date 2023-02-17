@@ -1,10 +1,14 @@
-.center {
-  text-align: center;
-/*  border: 3px solid green;*/
-}
-
 .right {
   text-align: right;
+}
+
+.top {
+  vertical-align: top;
+}
+
+.center {
+  text-align: center;
+  vertical-align: center;
 }
 
 td.right {
@@ -25,3 +29,12 @@ td.right {
     color: rgb(60, 0, 250);
 }
 
+td.border-top {
+    border-collapse: collapse;
+    border-top: 1px solid #000;
+}
+
+td.border-bottom {
+    border-collapse: collapse;
+    border-bottom: 1px solid #000;
+}
