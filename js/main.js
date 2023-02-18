@@ -219,9 +219,9 @@ function sandbox() {
 //
 document.getElementById('hit').onclick = function() {
   var hitData = {};
-  hitData.exitSpeed = document.getElementById('exit-speed').value;
-  hitData.theta = document.getElementById('exit-theta').value;
-  hitData.phi = document.getElementById('exit-phi').value;
+  hitData.exitSpeed = document.getElementById('exit-speed').value; // mph
+  hitData.theta = document.getElementById('exit-theta').value; // degrees
+  hitData.phi = document.getElementById('exit-phi').value; // degrees
   hitData.handedness = document.getElementById('handedness').value;
   batter.hit(ball, fielder, hitData);
 }

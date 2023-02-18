@@ -57,12 +57,11 @@ export class Ball {
     this.position = new THREE.Vector3(0, 0.9144, 0); // 3 feet above home plate
   }
 
-  hit(velocity) {
+  hit(ballData) {
+    this._ballData = ballData;
     this.reset();
-    this._ballData = Outfielder();
     this._clock = new THREE.Clock();
     this._elapsedTime = 0;
-    console.log(this._ballData);
   }
 
   update(tickData) {

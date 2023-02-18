@@ -30,7 +30,7 @@ function init_2darray(n, m, val) {
   return arr;
 }
 
-export function Outfielder() {
+export function Outfielder(hitData) {
 
   // declarations
   var m, circ, vmph, theta, phi, phifinal, k, a, area, dd, alpha, rr, ttilde, gamm, Vprime;
@@ -60,10 +60,10 @@ export function Outfielder() {
   z[0] = 3.0;
   t[0] = 0.0;         // initial time
   h = 5.0;           // final height of the ball when it is caught (ft)
-  vmph = 100.0;       // ball exit speed (mph)
-  theta = 30.0;       // launch angle of the ball above the horizontal (degrees)
-  phi =   0.0;       // initial bearing angle of the ball measured horizontally to the right of the y axis (degrees)
-  b = 1;               // batter handedness (1 = right hand, -1 = left hand)
+  vmph = hitData.exitSpeed;       // ball exit speed (mph)
+  theta = hitData.theta;       // launch angle of the ball above the horizontal (degrees)
+  phi =   hitData.phi;       // initial bearing angle of the ball measured horizontally to the right of the y axis (degrees)
+  b = hitData.handedness;               // batter handedness (1 = right hand, -1 = left hand)
     
   // fielder inputs
 
