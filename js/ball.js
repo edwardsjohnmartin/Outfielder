@@ -1,17 +1,16 @@
 import * as THREE from './libs/three.module.js';
 import {Outfielder} from './outfielder.js';
+import {Pausable} from './pausable.js';
 
 const gravity = new THREE.Vector3(0, -9.81, 0);
 
-export class Ball {
+export class Ball extends Pausable {
   constructor () {
+    super();
     this._fileLocation = "assets/baseball/scene.gltf";
     this._geo = null;
     this._inited = false;
     this._ballData = null;
-    this._clock = null;
-    this._elapsedTime = 0;
-    this._pause = false;
     this._simSpeed = 1.0;
   }
 
@@ -31,21 +30,6 @@ export class Ball {
     }
   }
 
-  set pause(p) {
-    this._pause = p;
-    if (!this._clock) { // Not running a ball sim.
-      return;
-    }
-    
-    if (p) {
-      this._elapsedTime = this._elapsedTime + this._clock.getElapsedTime();
-      this._clock.stop();
-    }
-    else {
-      this._clock.start();
-    }
-  }
-
   init(geo) {
     this._geo = geo;
     this._inited = true;
@@ -58,24 +42,21 @@ export class Ball {
   }
 
   hit(ballData) {
+    this.startClock();
     this._ballData = ballData;
     this.reset();
-    this._clock = new THREE.Clock();
-    this._elapsedTime = 0;
   }
 
   update(tickData) {
-    if (!this._clock) {
+    if (this.paused || !this._ballData) {
       return;
     }
 
-    const et = this._clock.getElapsedTime() + this._elapsedTime;
-    const i = et*100 | 0;
-    
-    if (et > this._ballData.tc) {
-      this._clock = null;
+    if (this.elapsedTime > this._ballData.tc) {
+      this.stopClock();
       return;
     }
+    const i = this.elapsedTime*100 | 0;
     this._geo.position.set(this._ballData.y[i]*0.3048, this._ballData.z[i]*0.3048, this._ballData.x[i]*0.3048);
     
     const timeDelta = tickData.get("deltaTime");

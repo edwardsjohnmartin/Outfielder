@@ -1,10 +1,11 @@
 import * as THREE from './libs/three.module.js';
 import {ObjectLabel} from './objectLabel.js';
+import {Pausable} from './pausable.js';
 
 var outfielderDist = 106.0;
 var outfielderAngle = 30 * Math.PI / 180;
 
-export class Fielder {
+export class Fielder extends Pausable {
   static get centerField() {return new THREE.Vector3(106.0, 0, 0);}
   static get leftField() {
     return new THREE.Vector3(outfielderDist*Math.cos(outfielderAngle), 0, -outfielderDist*Math.sin(outfielderAngle));
@@ -15,11 +16,13 @@ export class Fielder {
   static get cyclopianEyeHeight() {return new THREE.Vector3(0, 1.879, 0);}  // 6'2"
 
   constructor () {
+    super();
     this._velocity = new THREE.Vector3(0, 0, 0);
     this._rotation = new THREE.Vector3(0, 0, 0);
     this._fileLocation = "assets/characters/lowpoly_dude.glb";
     this._inited = false;
     this._label = new ObjectLabel();
+    this._fielderData = null;
   }
 
   get inited() {return this._inited;}
@@ -58,9 +61,23 @@ export class Fielder {
   }
 
   hit(fielderData) {
+    this.startClock();
+    this._fielderData = fielderData;
   }
 
   update(tickData) {
     this._label.update(tickData);
+
+    if (this.paused || !this._fielderData) {
+      return;
+    }
+
+    if (this.elapsedTime > this._fielderData.tc) {
+      this.stopClock();
+      return;
+    }
+
+    const i = this.elapsedTime*100 | 0;
+    this._geo.position.set(this._fielderData.tpY[i]*0.3048, 0, this._fielderData.tpX[i]*0.3048);
   }
 }
