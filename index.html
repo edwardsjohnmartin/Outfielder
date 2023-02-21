@@ -55,8 +55,8 @@
                 <select id="cameras">
                   <option value=0>Fielder</option>
                   <option value=2>Chase</option>
-                  <option value=1>Home Plate</option>
-                  <option value=3 selected>First Base</option>
+                  <option value=1 selected>Home Plate</option>
+                  <option value=3>First Base</option>
                   <option value=4>Third Base</option>
                   <option value=5>Fixed 3</option>
                 </select>
@@ -132,7 +132,7 @@
                 <label for="fielder-x">x (feet):</label>
               </td>
               <td>
-                <input type="number" id="fielder-x" min="50" max="200" value="100" step="10">
+                <input type="number" id="fielder-x" min="-200" max="200" value="-50" step="25">
               </td>
             </tr>
             <tr>
@@ -140,7 +140,7 @@
                 <label for="fielder-y">y (feet):</label>
               </td>
               <td>
-                <input type="number" id="fielder-y" min="0" max="90" value="30" step="5">
+                <input type="number" id="fielder-y" min="100" max="500" value="450" step="25">
               </td>
             </tr>
             <tr><td colspan="2" class="center border-bottom"></td></tr>

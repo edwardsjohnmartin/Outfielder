@@ -20,6 +20,6 @@ export class Batter {
     console.log(hitData);
     this._outfielderData = Outfielder(hitData);
     ball.hit(this._outfielderData);
-//    fielder.hit(this._outfielderData);
+    fielder.hit(this._outfielderData);
   }
 }

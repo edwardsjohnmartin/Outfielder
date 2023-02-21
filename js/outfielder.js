@@ -67,8 +67,8 @@ export function Outfielder(hitData) {
     
   // fielder inputs
 
-  xx0 = -50.0;        // initial fielder position (ft)
-  yy0 = 500.0;        // RF: (220,300) CF: (38,410) LF: (-200,370)
+  xx0 = hitData.fielderX;        // initial fielder position (ft)
+  yy0 = hitData.fielderY;        // RF: (220,300) CF: (38,410) LF: (-200,370)
   tau = 0.0;         // response time (s) (if tau1 > 0 and tau2 > 0, then set tau = 0)
   tau1 = 0.5;        // initial time delay constant 1 (s) (If tau > 0, then set tau1 = tau2 = 0)
   tau2 = 1.5;        // initial time delay constant 2 (s)
@@ -171,10 +171,10 @@ export function Outfielder(hitData) {
 
   // fielder initializations
 
-  n = tau/dt;                                            // number of time steps of response time (hundredths of a second for dt = 0.01 s)
+  n = tau/dt | 0;                                            // number of time steps of response time (hundredths of a second for dt = 0.01 s)
   phiR = Math.atan2(xx0,yy0)*180.0/pi;                       // bearing angle of initial position vector of fielder (deg)
-  tau0 = tau1 + tau2*Math.exp((-(phiR-phi))**2/deltaphi0**2);   // initial time delay (s)
-  n0 = tau0/dt;                                          // number of time steps of initial time delay (hundredths of a second for dt = 0.01 s)
+  tau0 = tau1 + tau2*Math.exp((-((phiR-phi)**2))/(deltaphi0**2));   // initial time delay (s)
+  n0 = tau0/dt | 0;                                          // number of time steps of initial time delay (hundredths of a second for dt = 0.01 s)
   if (n+n0 > NMAX) {
     console.log("n+n0 > NMAX");
     return;
@@ -248,7 +248,7 @@ export function Outfielder(hitData) {
         }
         else {
           Vprime = Vtmax - (Vtmax-vv[c][i-1])*Math.exp(gamm*(t[i]-t[i-1]));
-          if (vv[c][i].lt.Vprime) {
+          if (vv[c][i] < Vprime) {
             scalecoordinates(c,i,deltat,Vprime);
             [ww, psi, alpha] = setangles(c,i);
           }
@@ -259,21 +259,7 @@ export function Outfielder(hitData) {
     }
   }
 
-  return {t, x, y, z, tc, xx, yy};
-
-  // output results
-/*
-  for (c = 1; c <= 3; c++) {
-    write (*,'(90(f12.6,","))') Dist(c), Vave(c)
-  }
-  open(file="output.csv",unit=11,status="unknown")
-  write (11,*)"t, x, y, z, d, X1, Y1, Vx1, Vy1, V1, X2, Y2, Vx2, Vy2, V2, X3, Y3, Vx3, Vy3, V3"
-  do i = 0, ic
-  write (11,'(90(f12.6,","))') t[i], x[i], y[i], z[i], d[i], xx(1,i), yy(1,i), vvx(1,i), vvy(1,i), vv(1,i), &
-    xx(2,i), yy(2,i), vvx(2,i), vvy(2,i), vv(2,i), xx(3,i), yy(3,i), vvx(3,i), vvy(3,i), vv(3,i)
-  enddo
-  close(unit=11)
-*/
+  return {t, x, y, z, tc, tpX:xx[1], tpY:yy[1], oacX:xx[2], oacY:yy[2], aacX:xx[3], aacY:yy[3]};
 }
 
 function setangles(c,i) {

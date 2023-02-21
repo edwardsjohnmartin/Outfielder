@@ -100,7 +100,7 @@ function initScene() {
   loader.load(fielder.fileLocation, function(gltf) {
     scene.add(gltf.scene);
     fielder.init(gltf.scene);
-    fielder.position = Fielder.rightField;
+    setFielderPos();
 
     if (envInited && ball.inited && fielder.inited) {
       sceneInited = true;
@@ -223,6 +223,8 @@ document.getElementById('hit').onclick = function() {
   hitData.theta = document.getElementById('exit-theta').value; // degrees
   hitData.phi = document.getElementById('exit-phi').value; // degrees
   hitData.handedness = document.getElementById('handedness').value;
+  hitData.fielderX = fielder.position.z * 3.281;
+  hitData.fielderY = fielder.position.x * 3.281;
   batter.hit(ball, fielder, hitData);
 }
 
@@ -261,3 +263,10 @@ function getCanvasRect() {
   canvasRect = canvas.getBoundingClientRect();
 }
 
+document.getElementById('fielder-y').addEventListener("change", (event) => {setFielderPos();})
+document.getElementById('fielder-x').addEventListener("change", (event) => {setFielderPos();})
+function setFielderPos() {
+  fielder.position = new THREE.Vector3(document.getElementById('fielder-y').value / 3.281,
+                                       0,
+                                       document.getElementById('fielder-x').value / 3.281);
+}

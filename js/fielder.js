@@ -57,6 +57,9 @@ export class Fielder {
 //    this._label.init(geo, "Hoopdy");
   }
 
+  hit(fielderData) {
+  }
+
   update(tickData) {
     this._label.update(tickData);
   }
