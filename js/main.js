@@ -55,7 +55,7 @@ function initControls() {
 //  y: up
 //  z: right
 //
-// Model axes:
+// Boyd's axes:
 //  x: right
 //  y: toward second base
 //  z: up
@@ -179,6 +179,7 @@ function render() {
     tickData.set("frustum", getFrustum(camera));  // All labels need this.
     fielder.update(tickData);
     diagram.update(tickData);
+    realtimeData();
   }
   renderer.render(scene, camera.renderCamera);
 }
@@ -272,4 +273,17 @@ function setFielderPos() {
   fielder.position = new THREE.Vector3(document.getElementById('fielder-y').value / 3.281,
                                        0,
                                        document.getElementById('fielder-x').value / 3.281);
+}
+
+function realtimeData() {
+  document.getElementById('rt-fielder-x').innerHTML = (fielder.position.z * 3.281) | 0;
+  document.getElementById('rt-fielder-y').innerHTML = (fielder.position.x * 3.281) | 0;
+
+  document.getElementById('rt-ball-x').innerHTML = (ball.position.z * 3.281) | 0;
+  document.getElementById('rt-ball-y').innerHTML = (ball.position.x * 3.281) | 0;
+  document.getElementById('rt-ball-z').innerHTML = (ball.position.y * 3.281) | 0;
+
+  if (ball.flightTime > 0) {
+    document.getElementById('rt-time').innerHTML = ball.flightTime.toFixed(2);
+  }
 }

@@ -82,10 +82,11 @@
             </tr>
             <tr>
               <td class="right">
-                <label for="exit-speed">Exit speed (mph):</label>
+                <label for="exit-speed">Exit speed:</label>
               </td>
               <td>
                 <input type="number" id="exit-speed" min="50" max="200" value="100" step="10">
+                &nbsp;mph
               </td>
             </tr>
             <tr>
@@ -93,7 +94,7 @@
                 <label for="exit-theta">theta (from horizontal):</label>
               </td>
               <td>
-                <input type="number" id="exit-theta" min="0" max="90" value="30" step="5">
+                <input type="number" id="exit-theta" min="0" max="90" value="30" step="5">&nbsp;&deg;
               </td>
             </tr>
             <tr>
@@ -101,7 +102,7 @@
                 <label for="exit-phi">phi (from center field):</label>
               </td>
               <td>
-                <input type="number" id="exit-phi" min="-45" max="45" value="0" step="5">
+                <input type="number" id="exit-phi" min="-45" max="45" value="0" step="5">&nbsp;&deg;
               </td>
             </tr>
             <tr>
@@ -129,18 +130,18 @@
             </tr>
             <tr>
               <td class="right">
-                <label for="fielder-x">x (feet):</label>
+                <label for="fielder-x">x<sub>0</sub>:</label>
               </td>
               <td>
-                <input type="number" id="fielder-x" min="-200" max="200" value="-50" step="25">
+                <input type="number" id="fielder-x" min="-200" max="200" value="-50" step="25">&nbsp;ft
               </td>
             </tr>
             <tr>
               <td class="right">
-                <label for="fielder-y">y (feet):</label>
+                <label for="fielder-y">y<sub>0</sub>:</label>
               </td>
               <td>
-                <input type="number" id="fielder-y" min="100" max="500" value="450" step="25">
+                <input type="number" id="fielder-y" min="100" max="500" value="450" step="25">&nbsp;ft
               </td>
             </tr>
             <tr>
@@ -153,6 +154,40 @@
                   <option value=2>OAC</option>
                   <option value=3>AAC</option>
                 </select>
+              </td>
+            </tr>
+            <tr><td colspan="2" class="center border-bottom"></td></tr>
+            <!-- Output -->
+            <tr>
+              <td colspan="2" class="center">
+                <strong>Real time data</strong>
+              </td>
+            </tr>
+            <tr>
+              <td class="right">
+                <label>Fielder (x, y):</label>
+              </td>
+              <td>
+                (<span id="rt-fielder-x">0</span>,
+                <span id="rt-fielder-y">0</span>)&nbsp;ft
+              </td>
+            </tr>
+            <tr>
+              <td class="right">
+                <label>Ball (x, y, z):</label>
+              </td>
+              <td>
+                (<span id="rt-ball-x">0</span>,
+                <span id="rt-ball-y">0</span>,
+                <span id="rt-ball-z">0</span>)&nbsp;ft
+              </td>
+            </tr>
+            <tr>
+              <td class="right">
+                <label for="rt-time">Flight time:</label>
+              </td>
+              <td>
+                <span id="rt-time">0.00</span>s
               </td>
             </tr>
             <tr><td colspan="2" class="center border-bottom"></td></tr>

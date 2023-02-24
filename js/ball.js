@@ -30,6 +30,13 @@ export class Ball extends Pausable {
     }
   }
 
+  get flightTime() {
+    if (this.paused || !this._ballData) {
+      return 0;
+    }
+    return this.elapsedTime;
+  }
+
   init(geo) {
     this._geo = geo;
     this._inited = true;
