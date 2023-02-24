@@ -100,7 +100,7 @@ function initScene() {
   loader.load(fielder.fileLocation, function(gltf) {
     scene.add(gltf.scene);
     fielder.init(gltf.scene);
-    setFielderPos();
+    setFielderPos(false);
 
     if (envInited && ball.inited && fielder.inited) {
       sceneInited = true;
@@ -220,7 +220,7 @@ function sandbox() {
 //
 document.getElementById('hit').onclick = function() {
   var hitData = {};
-  setFielderPos();
+  setFielderPos(false);
   hitData.exitSpeed = parseInt(document.getElementById('exit-speed').value); // mph
   hitData.theta = parseInt(document.getElementById('exit-theta').value); // degrees
   hitData.phi = parseInt(document.getElementById('exit-phi').value); // degrees
@@ -267,9 +267,13 @@ function getCanvasRect() {
   canvasRect = canvas.getBoundingClientRect();
 }
 
-document.getElementById('fielder-y').addEventListener("change", (event) => {setFielderPos();})
-document.getElementById('fielder-x').addEventListener("change", (event) => {setFielderPos();})
-function setFielderPos() {
+document.getElementById('fielder-y').addEventListener("change", (event) => {setFielderPos(true);})
+document.getElementById('fielder-x').addEventListener("change", (event) => {setFielderPos(true);})
+function setFielderPos(reset) {
+  if (reset) {
+    diagram.reset();
+    ball.reset();
+  }
   fielder.position = new THREE.Vector3(document.getElementById('fielder-y').value / 3.281,
                                        0,
                                        document.getElementById('fielder-x').value / 3.281);

@@ -42,20 +42,33 @@ export class MotionPaths {
     return false;
   }
 
+  reset() {
+    for (var i = 1; i <= 3; i++) {
+      this._motionPoints[i].length = 0;
+      if (this._paths[i]) {
+        this.destroyPath(this._paths[i]);
+        this._paths[i] = null;
+      }
+    }
+  }
+
   createPath() {
     const motionPoints = this._motionPoints[this._hitData.motion];
     if (this._paths[this._hitData.motion]) {
-      const geo = this._paths[this._hitData.motion];
-      geo.removeFromParent();
-      geo.geometry.dispose();
-      geo.material.dispose();
-      geo.clear();
+      this.destroyPath(this._paths[this._hitData.motion]);
     }
     const buffer = new THREE.BufferGeometry().setFromPoints(motionPoints);
     const path = new THREE.Line(buffer, new THREE.LineBasicMaterial({color:this.pathColor()}));
     path.frustumCulled = false;
     this._scene.add(path);
     this._paths[this._hitData.motion] = path;
+  }
+
+  destroyPath(geo) {
+    geo.removeFromParent();
+    geo.geometry.dispose();
+    geo.material.dispose();
+    geo.clear();
   }
 
   pathColor() {

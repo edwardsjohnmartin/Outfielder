@@ -50,6 +50,10 @@ export class Diagram extends Pausable {
     //    this.debugLines(scene);
     this._motionPaths.init(scene);
   }
+
+  reset() {
+    this._motionPaths.reset();
+  }
   
   update(tickData) {
     let ballPos = tickData.get("ball").position;
