@@ -17,8 +17,8 @@ export class Batter {
   }
 
   hit(ball, fielder, hitData) {
-    console.log(hitData);
     this._outfielderData = Outfielder(hitData);
+    this._outfielderData.motion = hitData.motion;
     ball.hit(this._outfielderData);
     fielder.hit(this._outfielderData);
   }

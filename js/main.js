@@ -225,7 +225,9 @@ document.getElementById('hit').onclick = function() {
   hitData.handedness = document.getElementById('handedness').value;
   hitData.fielderX = fielder.position.z * 3.281;
   hitData.fielderY = fielder.position.x * 3.281;
+  hitData.motion = document.getElementById('motion').value;
   batter.hit(ball, fielder, hitData);
+  diagram.reset();
 }
 
 document.getElementById('randomize').onclick = function() {

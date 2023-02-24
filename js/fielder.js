@@ -78,6 +78,8 @@ export class Fielder extends Pausable {
     }
 
     const i = this.elapsedTime*100 | 0;
-    this._geo.position.set(this._fielderData.tpY[i]*0.3048, 0, this._fielderData.tpX[i]*0.3048);
+    this._geo.position.set(this._fielderData.yy[this._fielderData.motion][i]*0.3048,
+                           0,
+                           this._fielderData.xx[this._fielderData.motion][i]*0.3048);
   }
 }

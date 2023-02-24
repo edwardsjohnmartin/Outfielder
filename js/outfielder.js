@@ -259,7 +259,7 @@ export function Outfielder(hitData) {
     }
   }
 
-  return {t, x, y, z, tc, tpX:xx[1], tpY:yy[1], oacX:xx[2], oacY:yy[2], aacX:xx[3], aacY:yy[3]};
+  return {t, x, y, z, tc, xx, yy};
 }
 
 function setangles(c,i) {

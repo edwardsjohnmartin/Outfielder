@@ -23,7 +23,12 @@ export class Diagram {
     this._angles = [];
     this._angles.push(new Angle()); // Alpha
     this._angles.push(new Angle()); // Psi
-}
+
+    this._fielderLines = [];
+    this._fielderLines[1].append([]);
+    this._fielderLines[2].append([]);
+    this._fielderLines[3].append([]);
+  }
   
   init(scene) {
     this._r.init(scene, "r");
@@ -56,6 +61,18 @@ export class Diagram {
     this.updatePoints(tickData, ballPos, cyclopianEyePos);
     this.updateLines(tickData, ballPos, cyclopianEyePos);
     this.updateAngles(tickData, ballPos, cyclopianEyePos);
+
+    this.updateFielderMotion(tickData);
+  }
+
+  reset() {
+    this._fielderLines = null;
+  }
+  
+  updateFielderMotion(tickData) {
+    if (!this._fielderLines) {
+      
+    }
   }
 
   updateAngles(tickData, ballPos, cyclopianEyePos) {
