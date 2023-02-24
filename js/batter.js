@@ -16,10 +16,11 @@ export class Batter {
     this._position.set(pos.x, pos.y, pos.z);
   }
 
-  hit(ball, fielder, hitData) {
+  hit(ball, fielder, diagram, hitData) {
     this._outfielderData = Outfielder(hitData);
     this._outfielderData.motion = hitData.motion;
     ball.hit(this._outfielderData);
     fielder.hit(this._outfielderData);
+    diagram.hit(this._outfielderData);
   }
 }

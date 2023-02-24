@@ -3,9 +3,12 @@ import {Line} from './line.js';
 import {Arrow} from './arrow.js';
 import {Label} from './label.js';
 import {Angle} from './angle.js';
+import {Pausable} from './pausable.js';
+import {MotionPaths} from './motionPaths.js';
 
-export class Diagram {
+export class Diagram extends Pausable {
   constructor () {
+    super();
     this._r = new Arrow();
     this._rPrime = new Arrow();
     this._R = new Arrow();
@@ -24,10 +27,7 @@ export class Diagram {
     this._angles.push(new Angle()); // Alpha
     this._angles.push(new Angle()); // Psi
 
-    this._fielderLines = [];
-    this._fielderLines[1].append([]);
-    this._fielderLines[2].append([]);
-    this._fielderLines[3].append([]);
+    this._motionPaths = new MotionPaths();
   }
   
   init(scene) {
@@ -48,6 +48,7 @@ export class Diagram {
     this._angles[1].init(scene, "psi");
 
     //    this.debugLines(scene);
+    this._motionPaths.init(scene);
   }
   
   update(tickData) {
@@ -62,19 +63,17 @@ export class Diagram {
     this.updateLines(tickData, ballPos, cyclopianEyePos);
     this.updateAngles(tickData, ballPos, cyclopianEyePos);
 
-    this.updateFielderMotion(tickData);
-  }
-
-  reset() {
-    this._fielderLines = null;
-  }
-  
-  updateFielderMotion(tickData) {
-    if (!this._fielderLines) {
-      
+    // true return value means we're done.
+    if (this._motionPaths.update(tickData, this.paused, this.elapsedTime)) {
+      this.stopClock();
     }
   }
 
+  hit(hitData) {
+    this.startClock();
+    this._motionPaths.hit(hitData);
+  }
+  
   updateAngles(tickData, ballPos, cyclopianEyePos) {
     // Alpha
     var p1 = this._D.clone().sub(cyclopianEyePos);

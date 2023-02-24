@@ -219,15 +219,15 @@ function sandbox() {
 //
 document.getElementById('hit').onclick = function() {
   var hitData = {};
-  hitData.exitSpeed = document.getElementById('exit-speed').value; // mph
-  hitData.theta = document.getElementById('exit-theta').value; // degrees
-  hitData.phi = document.getElementById('exit-phi').value; // degrees
-  hitData.handedness = document.getElementById('handedness').value;
+  setFielderPos();
+  hitData.exitSpeed = parseInt(document.getElementById('exit-speed').value); // mph
+  hitData.theta = parseInt(document.getElementById('exit-theta').value); // degrees
+  hitData.phi = parseInt(document.getElementById('exit-phi').value); // degrees
+  hitData.handedness = parseInt(document.getElementById('handedness').value);
   hitData.fielderX = fielder.position.z * 3.281;
   hitData.fielderY = fielder.position.x * 3.281;
-  hitData.motion = document.getElementById('motion').value;
-  batter.hit(ball, fielder, hitData);
-  diagram.reset();
+  hitData.motion = parseInt(document.getElementById('motion').value);
+  batter.hit(ball, fielder, diagram, hitData);
 }
 
 document.getElementById('randomize').onclick = function() {
@@ -239,8 +239,9 @@ document.getElementById('lookat').addEventListener("change", (event) => {
 });
 document.getElementById('pause').addEventListener("change", (event) => {
   pauseSim = event.target.checked;
-  ball.pause = pauseSim;
-//  fielder.paused = pauseSim;
+  ball.pause(pauseSim);
+  diagram.pause(pauseSim);
+  fielder.pause(pauseSim);
 });
 
 document.getElementById('sim-speed').addEventListener("change", (event) => {

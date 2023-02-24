@@ -7,7 +7,7 @@ export class Pausable {
     this._pause = false;
   }
 
-  set pause(p) {
+  pause(p) {
     this._pause = p;
     if (!this._clock) { // Not running a ball sim.
       return;
@@ -23,6 +23,9 @@ export class Pausable {
   }
 
   get elapsedTime() {
+    if (!this._clock) {
+      return 0;
+    }
     return this._clock.getElapsedTime() + this._elapsedTime;
   }
 
