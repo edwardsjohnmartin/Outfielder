@@ -34,17 +34,19 @@ export function Outfielder(hitData) {
 
   // declarations
   var m, circ, vmph, theta, phi, phifinal, k, a, area, dd, alpha, rr, ttilde, gamm, Vprime;
-  var tau, tau0, tau1, tau2, dt, tempF, elevft, RH, pressurein, beta, pi, hmax, phiR, tmax, dmax;
+  var tau, tau0, dt, tempF, elevft, RH, pressurein, beta, pi, hmax, tmax, dmax;
   var wb, wg, ws, temp, elev, pressure, SVP, rhoSI, rhoI, tc, xc, yc, zc, psi;
   var wx, wy, wz, w, wpar, wperp, g, Cd, Cm, S, ax, ay, az, ww;
-  var deltaphi0, xx0, yy0, Vtmax, Vt, phiTP, rad, ds;
-  var dptplane, ang, deltat;
-  var b, i, c, ic, n0;
+  var xx0, yy0, Vtmax, Vt, phiTP, rad, ds, dr;
+  var dptplane, ang, deltat, ddmax;
+  var b, i, c, ic, n0, j;
+  var xxx, yyy;
 
   // arrays
   var d = Array(NMAX).fill(0.0);
   var dist = Array(4).fill(0.0);
   var vave = Array(4).fill(0.0);
+  var distfin = Array(4).fill(0.0);
 
   // calculation inputs
 
@@ -69,13 +71,12 @@ export function Outfielder(hitData) {
 
   xx0 = hitData.fielderX;        // initial fielder position (ft)
   yy0 = hitData.fielderY;        // RF: (220,300) CF: (38,410) LF: (-200,370)
-  tau = 0.0;         // response time (s) (if tau1 > 0 and tau2 > 0, then set tau = 0)
-  tau1 = 0.5;        // initial time delay constant 1 (s) (If tau > 0, then set tau1 = tau2 = 0)
-  tau2 = 1.5;        // initial time delay constant 2 (s)
-  deltaphi0 = 5.0;    // angle spread delta phi_0 for initial response time calculation (deg)
+  tau = 0.0;         // response time (s) (if tau0 > 0, then set tau = 0)
+  tau0 = 0.5;        // initial time delay constant 1 (s) (If tau > 0, then set tau0 = 0)
   gamm = 1.0;        // fielder sprint time constant (gamma, 1/s)
-  //Vtmax = 1000000.0;   // maximum terminal velocity of fielder (ft/s)
-  Vtmax = 30.0;      // maximum terminal velocity of fielder (ft/s)
+  dr = 2.0;          // the fielder must be within a distance dr from the catch point of the ball in order to catch it (ft)
+  //Vtmax = 1000000.0;   // maximum speed of fielder for standard (not acceleration limited) models (ft/s)
+  Vtmax = 30.0;      // maximum speed of fielder (ft/s)
   
   // field inputs
 
@@ -163,7 +164,7 @@ export function Outfielder(hitData) {
       z[i] = zc;
       phifinal = Math.atan(xc/yc)*180/pi;               // ball bearing angle at time of catch
       d[i] = Math.sqrt(xc**2+yc**2);                    // ball horizontal distance from home plate at time of catch
-      ang = Math.abs(phifinal-phi)*pi/180;
+      ang = (phifinal-phi)*pi/180;
       dptplane = d[i]*Math.sin(ang);                    // distance from landing point to initial plane of motion
     }
   }
@@ -172,19 +173,17 @@ export function Outfielder(hitData) {
   // fielder initializations
 
   n = tau/dt | 0;                                            // number of time steps of response time (hundredths of a second for dt = 0.01 s)
-  phiR = Math.atan2(xx0,yy0)*180.0/pi;                       // bearing angle of initial position vector of fielder (deg)
-  tau0 = tau1 + tau2*Math.exp((-((phiR-phi)**2))/(deltaphi0**2));   // initial time delay (s)
   n0 = tau0/dt | 0;                                          // number of time steps of initial time delay (hundredths of a second for dt = 0.01 s)
   if (n+n0 > NMAX) {
     console.log("n+n0 > NMAX");
     return;
   }
-  if (z[n0] < h) { // hold the fielder stationary until the ball is at or above the horizontal direction
+  if (z[n+n0] < h) { // hold the fielder stationary until the ball is at or above the horizontal direction
     i = 1;
-    while (z[n0+i] < h) {
+    while (z[n+n0+i] < h) {
       i = i + 1;
     }
-    n0 = n0 + i; // increase the initial delay time n0 so that the z(n0) is greater than or equal to h
+    n0 = n0 + i; // increase the initial delay time n0 so that the z(n+n0) is greater than or equal to h
   }
   for(c = 1; c <= 3; c++) {    // keep the fielder at his initial position during the response time and the initial delay time
     dist[c] = 0.0;
@@ -202,7 +201,8 @@ export function Outfielder(hitData) {
   ttilde = (n+n0)*dt;                      // time when fielder starts accelerating from rest (s)
   dd = Math.sqrt((xc-xx0)**2+(yc-yy0)**2);      // initial horizontal distance from fielder to ball (ft)
   phiTP = Math.atan2(xc-xx0,yc-yy0);            // bearing angle of fielder to ball (measured to the right of the y axis)
-  Vt = gamm*dd/(Math.exp(-gamm*(tc-ttilde)) - 1.0 + gamm*(tc-ttilde)); // terminal speed (ft/s)
+  Vt = (dd-dr)/(tc - ttilde - (1.0 - Math.exp(-gamm*(tc-ttilde)))/gamm); // terminal speed (ft/s)  
+  ddmax = dr + Vtmax*(tc-ttilde) - Vtmax*(1.0-Math.exp(-gamm*(tc-ttilde)))/gamm; // catch radius
   if (Vt > Vtmax) {
     console.log(Vt, Vtmax, "TP unsuccessful");
     Vt = Vtmax;
@@ -241,21 +241,22 @@ export function Outfielder(hitData) {
       vv[c][i] = Math.sqrt(vvx[c][i]**2 + vvy[c][i]**2);
       deltat = t[i]-t[i-1];
       if (vv[c][i] > vv[c][i-1]) {
-        Vprime = Vtmax - (Vtmax-vv[c][i-1])*Math.exp(-gamm*(t[i]-t[i-1]));
+        Vprime = Vtmax - (Vtmax-vv[c][i-1])*Math.exp(-gamm*deltat);
         if (vv[c][i] > Vprime) { 
           scalecoordinates(c,i,deltat,Vprime);
           [ww, psi, alpha] = setangles(c,i);
         }
         else {
-          Vprime = Vtmax - (Vtmax-vv[c][i-1])*Math.exp(gamm*(t[i]-t[i-1]));
+          Vprime = Vtmax - (Vtmax-vv[c][i-1])*Math.exp(gamm*deltat);
           if (vv[c][i] < Vprime) {
             scalecoordinates(c,i,deltat,Vprime);
             [ww, psi, alpha] = setangles(c,i);
           }
         }
-        dist[c] = dist[c] + Math.sqrt((xx[c][i]-xx[c][i-1])**2 + (yy[c][i]-yy[c][i-1])**2);
+        dist[c] = dist[c] + Math.sqrt((xx[c][i]-xx[c][i-1])**2 + (yy[c][i]-yy[c][i-1])**2); // Total distance traveled along path
       }
-      vave[c] = dist[c]/(tc-ttilde);
+      vave[c] = dist[c]/(tc-ttilde); // average speed
+      distfin[c] = Math.sqrt((xx[c][ic]-xc)**2 + (yy[c][ic]-yc)**2) // distance between final fielder position and ball catch position
     }
   }
 

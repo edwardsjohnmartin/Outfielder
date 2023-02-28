@@ -1,15 +1,15 @@
-Program Outfielder
+Program OutfielderSingle
 
 ! declarations
 
     implicit none
     double precision m, circ, vmph, theta, phi, phifinal, k, a, area, dd, alpha, rr, ttilde, gamm, Vprime
-    double precision tau, tau0, tau1, tau2, dt, tempF, elevft, RH, pressurein, beta, pi, h, hmax, phiR, tmax, dmax
+    double precision tau, tau0, dt, tempF, elevft, RH, pressurein, beta, pi, h, hmax, tmax, dmax
     double precision wb, wg, ws, temp, elev, pressure, SVP, rhoSI, rhoI, tc, xc, yc, zc, psi
     double precision wx, wy, wz, w, wpar, wperp, g, Cd, Cm, S, ax, ay, az, ww
-    double precision deltaphi0, xx0, yy0, Vtmax, Vt, phiTP, rad, ds
-    double precision dptplane, ang, deltat
-    integer b, i, n, c, NMAX, ic, n0
+    double precision xx0, yy0, Vtmax, Vt, phiTP, rad, ds, dr
+    double precision dptplane, ang, deltat, ddmax
+    integer b, i, n, c, NMAX, ic, n0, j
     parameter (NMAX=1000)                                           ! allow for hang times of up to 10 seconds
     double precision t(0:NMAX), x(0:NMAX), y(0:NMAX), z(0:NMAX)     ! ball positions
     double precision d(0:NMAX)                                      ! horizontal distance traveled by ball
@@ -17,6 +17,8 @@ Program Outfielder
     double precision xx(3,0:NMAX), yy(3,0:NMAX)                     ! fielder positions; 1 = TP, 2 = OAC, 3 = AAC
     double precision vvx(3,0:NMAX), vvy(3,0:NMAX), vv(3,0:NMAX)     ! fielder velocities
     double precision Dist(3), Vave(3)                               ! total distance traveled, average speed
+    double precision distfin(3)                                     ! distance between final fielder position and ball catch position
+    double precision xxx, yyy                                       ! coordinates of TP catch boundary
     common/ball/t,x,y,z,vx,vy,vz,v,h,n
     common/fielder/xx,yy,vvx,vvy,vv
 
@@ -41,15 +43,14 @@ Program Outfielder
     
 ! fielder inputs
 
-    xx0 = -50.d0        ! initial fielder position (ft)
-    yy0 = 500.d0        ! RF: (220,300) CF: (38,410) LF: (-200,370)
-    tau = 0.0d0         ! response time (s) (if tau1 > 0 and tau2 > 0, then set tau = 0)
-    tau1 = 0.5d0        ! initial time delay constant 1 (s) (If tau > 0, then set tau1 = tau2 = 0)
-    tau2 = 1.5d0        ! initial time delay constant 2 (s)
-    deltaphi0 = 5.d0    ! angle spread delta phi_0 for initial response time calculation (deg)
+    xx0 = 135.77d0        ! initial fielder position (ft)
+    yy0 = 378.d0        ! RF: (220,300) CF: (38,410) LF: (-200,370)
+    tau = 0.0d0         ! response time (s) (if tau0 > 0, then set tau = 0)
+    tau0 = 0.5d0        ! initial time delay (s) (If tau > 0, then set tau0 = 0)
     gamm = 1.0d0        ! fielder sprint time constant (gamma, 1/s)
-!    Vtmax = 1000000.0d0   ! maximum terminal velocity of fielder (ft/s)
-    Vtmax = 30.0d0      ! maximum terminal velocity of fielder (ft/s)
+    dr = 2.d0           ! the fielder must be within a distance dr from the catch point of the ball in order to catch it (ft)
+    Vtmax = 1000000.0d0 ! maximum terminal speed of fielder for standard (not acceleration limited) models (ft/s)
+    Vtmax = 30.0d0      ! maximum terminal speed of fielder (ft/s)
     
 ! field inputs
 
@@ -133,28 +134,25 @@ Program Outfielder
         z(i) = zc
         phifinal = atan(xc/yc)*180/pi               ! ball bearing angle at time of catch
         d(i) = sqrt(xc**2+yc**2)                    ! ball horizontal distance from home plate at time of catch
-        ang = abs(phifinal-phi)*pi/180
+        ang = (phifinal-phi)*pi/180
         dptplane = d(i)*sin(ang)                    ! distance from landing point to initial plane of motion
-        print *, tc, d(i), hmax, tmax, dmax, phifinal, xc, yc, wb, ws, dptplane
       endif
     enddo
 
 ! fielder initializations
 
     n = tau/dt                                            ! number of time steps of response time (hundredths of a second for dt = 0.01 s)
-    phiR = atan2(xx0,yy0)*180.d0/pi                       ! bearing angle of initial position vector of fielder (deg)
-    tau0 = tau1 + tau2*exp(-(phiR-phi)**2/deltaphi0**2)   ! initial time delay (s)
     n0 = tau0/dt                                          ! number of time steps of initial time delay (hundredths of a second for dt = 0.01 s)
     if (n+n0 .gt. NMAX) then
       print *, "n+n0 > NMAX"
       stop
     endif
-    if (z(n0).lt.h) then ! hold the fielder stationary until the ball is at or above the horizontal direction
+    if (z(n+n0).lt.h) then ! hold the fielder stationary until the ball is at or above the horizontal direction
       i = 1
-      do while (z(n0+i).lt.h)
+      do while (z(n+n0+i).lt.h)
         i = i + 1
       enddo
-      n0 = n0 + i ! increase the initial delay time n0 so that the z(n0) is greater than or equal to h
+      n0 = n0 + i ! increase the initial delay time n0 so that the z(n+n0) is greater than or equal to h
     endif
     do c = 1, 3    ! keep the fielder at his initial position during the response time and the initial delay time
       dist(c) = 0.d0
@@ -172,9 +170,11 @@ Program Outfielder
     ttilde = (n+n0)*dt                      ! time when fielder starts accelerating from rest (s)
     dd = sqrt((xc-xx0)**2+(yc-yy0)**2)      ! initial horizontal distance from fielder to ball (ft)
     phiTP = atan2(xc-xx0,yc-yy0)            ! bearing angle of fielder to ball (measured to the right of the y axis)
-    Vt = gamm*dd/(exp(-gamm*(tc-ttilde)) - 1.d0 + gamm*(tc-ttilde)) ! terminal speed (ft/s)
+    Vt = (dd-dr)/(tc - ttilde - (1.d0 - exp(-gamm*(tc-ttilde)))/gamm) ! terminal speed (ft/s)
+    ddmax = dr + Vtmax*(tc-ttilde) - Vtmax*(1.d0-exp(-gamm*(tc-ttilde)))/gamm ! catch radius
+    print *, vmph, theta, phi, b, wb, ws, d(ic), dptplane, tc, ddmax
     if (Vt .gt. Vtmax) then
-      print *, Vt, Vtmax, "TP unsuccessful"
+!      print *, Vt, Vtmax, "TP unsuccessful"
       Vt = Vtmax
     endif
     do i = n + n0 + 1, ic
@@ -207,37 +207,45 @@ Program Outfielder
         vv(c,i) = sqrt(vvx(c,i)**2 + vvy(c,i)**2)
         deltat = t(i)-t(i-1)
         if (vv(c,i).gt.vv(c,i-1)) then                  ! fielder speed is increasing with time
-          Vprime = Vtmax - (Vtmax-vv(c,i-1))*exp(-gamm*(t(i)-t(i-1)))
+          Vprime = Vtmax - (Vtmax-vv(c,i-1))*exp(-gamm*deltat)
           if (vv(c,i).gt.Vprime) then
             call scalecoordinates(c,i,deltat,Vprime)
             call setangles(c,i,ww,psi,alpha)
           endif
         else                                            ! fielder speed is decreasing with time
-          Vprime = Vtmax - (Vtmax-vv(c,i-1))*exp(gamm*(t(i)-t(i-1)))
+          Vprime = Vtmax - (Vtmax-vv(c,i-1))*exp(gamm*deltat)
           if (vv(c,i).lt.Vprime) then
             call scalecoordinates(c,i,deltat,Vprime)
             call setangles(c,i,ww,psi,alpha)
           endif
         endif
-        Dist(c) = Dist(c) + sqrt((xx(c,i)-xx(c,i-1))**2 + (yy(c,i)-yy(c,i-1))**2)
+        Dist(c) = Dist(c) + sqrt((xx(c,i)-xx(c,i-1))**2 + (yy(c,i)-yy(c,i-1))**2)   ! total distance traveled along path
       enddo
-      Vave(c) = Dist(c)/(tc-ttilde)
+      Vave(c) = Dist(c)/(tc-ttilde)                          ! average speed
+      distfin(c) = sqrt((xx(c,ic)-xc)**2 + (yy(c,ic)-yc)**2) ! distance between final fielder position and ball catch position
     enddo
 
 ! output results
 
-    do c = 1, 3
-      write (*,'(90(f12.6,","))') Dist(c), Vave(c)
-    enddo
     open(file="output.csv",unit=11,status="unknown")
     write (11,*)"t, x, y, z, d, X1, Y1, Vx1, Vy1, V1, X2, Y2, Vx2, Vy2, V2, X3, Y3, Vx3, Vy3, V3"
     do i = 0, ic
-      write (11,'(90(f12.6,","))') t(i), x(i), y(i), z(i), d(i), xx(1,i), yy(1,i), vvx(1,i), vvy(1,i), vv(1,i), &
+      write (11,'(90(f7.2,","))') t(i), x(i), y(i), z(i), d(i), xx(1,i), yy(1,i), vvx(1,i), vvy(1,i), vv(1,i), &
         xx(2,i), yy(2,i), vvx(2,i), vvy(2,i), vv(2,i), xx(3,i), yy(3,i), vvx(3,i), vvy(3,i), vv(3,i)
     enddo
     close(unit=11)
+    
+    open(file="TPcatch.csv",unit=11,status="unknown")
+    write (11,*) "j, X1, Y1"
+    do j = 0, 360
+      xxx = xc + ddmax*cos(j*pi/180)
+      yyy = yc + ddmax*sin(j*pi/180)
+      write (11,'(90(f7.2,","))') j*1.d0, xxx, yyy
+    enddo
+    close(unit=11)
 
-End Program Outfielder
+
+End Program OutfielderSingle
 
 subroutine setangles(c,i,ww,psi,alpha)
     implicit none
@@ -279,4 +287,5 @@ subroutine scalecoordinates(c,i,deltat,Vprime)
     yy(c,i) = yy(c,i-1) + deltat*vvy(c,i)
     return
     end
+
 
